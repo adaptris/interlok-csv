@@ -22,6 +22,7 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.ServiceImp;
+import com.adaptris.core.transform.FfTransformService;
 import com.adaptris.util.XmlUtils;
 import com.adaptris.util.license.License;
 import com.adaptris.util.license.License.LicenseType;
@@ -30,6 +31,81 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 /**
  * Simple CSV to XML using {@link CSVParser}
  * 
+ * <p>
+ * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a> as the parsing engine for a CSV
+ * file. Basic parsing options are supported : {@link BasicFormatBuilder.Style#DEFAULT DEFAULT},
+ * {@link BasicFormatBuilder.Style#EXCEL EXCEL}, {@link BasicFormatBuilder.Style#RFC4180 RFC4180},
+ * {@link BasicFormatBuilder.Style#MYSQL MYSQL} and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to
+ * the base formats defined by {@link CSVFormat}. In the event that you have custom quote characters, delimiters or record
+ * separators then you should be looking to use the {@link FfTransformService} instead or a custom implementation of
+ * {@link FormatBuilder}
+ * </p>
+ * <p>
+ * If {@link #setElementNamesFromFirstRecord(Boolean)} is true, then the first record is used to generate the element names;
+ * otherwise names are auto-generated based on the count of fields in the first row. Results are undefined if subsequent record
+ * contains more fields than the first record. If the first row contains a blank field then the <code>blank</code> is used as the
+ * element name.
+ * </p>
+ * <p>
+ * For example, given an input document :
+ * 
+ * <pre>
+ * <code>
+Event Name,Order Date,Ticket Type,Date Attending,Total Paid
+Glastonbury,"Sep 15, 2012",Free entry,"Jun 26, 2014 at 6:00 PM",0
+Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
+ * </code>
+ * </pre>
+ * Then the output (without a header row) would be
+ * 
+ * <pre>
+ * <code>
+ * &lt;csv-xml>
+ *   &lt;record-1>
+ *     &lt;csv-field-1>Event Name&lt;/csv-field-1>
+ *     &lt;csv-field-2>Order Date&lt;/csv-field-2>
+ *     &lt;csv-field-3>Ticket Type&lt;/csv-field-3>
+ *     &lt;csv-field-4>Date Attending&lt;/csv-field-4>
+ *     &lt;csv-field-5>Total Paid&lt;/csv-field-5>
+ *   &lt;/record-1>
+ *   &lt;record-2>
+ *     &lt;csv-field-1>Glastonbury&lt;/csv-field-1>
+ *     &lt;csv-field-2>Sep 15, 2012&lt;/csv-field-2>
+ *     &lt;csv-field-3>Free entry&lt;/csv-field-3>
+ *     &lt;csv-field-4>Jun 26, 2014 at 6:00 PM&lt;/csv-field-4>
+ *     &lt;csv-field-5>0&lt;/csv-field-5>
+ *   &lt;/record-2>
+ *   &lt;record-3>
+ *     &lt;csv-field-1>Reading Festival&lt;/csv-field-1>
+ *     &lt;csv-field-2>Sep 16, 2012&lt;/csv-field-2>
+ *     &lt;csv-field-3>Free entry&lt;/csv-field-3>
+ *     &lt;csv-field-4>Aug 30, 2014 at 6:00 PM&lt;/csv-field-4>
+ *     &lt;csv-field-5>0&lt;/csv-field-5>
+ *   &lt;/record-3>
+ * </code>
+ * </pre>
+ * 
+ * And with a header row specified :
+ * 
+ * <pre>
+ * <code>
+ * &lt;csv-xml>
+ *   &lt;record-1>
+ *     &lt;Event_Name>Glastonbury&lt;/Event_Name>
+ *     &lt;Order_Date>Sep 15, 2012&lt;/Order_Date>
+ *     &lt;Ticket_Type>Free entry&lt;/Ticket_Type>
+ *     &lt;Date_Attending>Jun 26, 2014 at 6:00 PM&lt;/Date_Attending>
+ *     &lt;Total_Paid>0&lt;/Total_Paid>
+ *   &lt;/record-1>
+ *   &lt;record-2>
+ *     &lt;Event_Name>Reading Festival&lt;/Event_Name>
+ *     &lt;Order_Date>Sep 16, 2012&lt;/Order_Date>
+ *     &lt;Ticket_Type>Free entry&lt;/Ticket_Type>
+ *     &lt;Date_Attending>Aug 30, 2014 at 6:00 PM&lt;/Date_Attending>
+ *     &lt;Total_Paid>0&lt;/Total_Paid>
+ *   &lt;/record-2>
+ * </code>
+ * </pre>
  * 
  * @config simple-csv-to-xml-transform
  * @license BASIC
@@ -58,56 +134,15 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   };
   private static final String ELEM_REPL_VALUE = "_";
 
-  /**
-   * enum representing the standard supported CSV Formats.
-   * 
-   * @see CSVFormat
-   */
-  public enum Style {
-    DEFAULT {
-      @Override
-      CSVFormat createFormat() {
-        return CSVFormat.DEFAULT;
-      }
-    },
-    EXCEL {
-      @Override
-      CSVFormat createFormat() {
-        return CSVFormat.EXCEL;
-      }
-    },
-    MYSQL {
-      @Override
-      CSVFormat createFormat() {
-        return CSVFormat.MYSQL;
-      }
-    },
-    RFC4180 {
-      @Override
-      CSVFormat createFormat() {
-        return CSVFormat.RFC4180;
-      }
-    },
-    TAB_DELIMITED {
-      @Override
-      CSVFormat createFormat() {
-        return CSVFormat.TDF;
-      }
-    };
-
-    abstract CSVFormat createFormat();
-  };
-
   private Boolean elementNamesFromFirstRecord;
   @NotNull
   @AutoPopulated
-  private Style style;
-  private String cdataColumnRegexp = null;
+  private FormatBuilder format;
   private Boolean stripIllegalXmlChars = null;
   private String outputMessageEncoding = null;
 
   public SimpleCsvToXmlTransformService() {
-    setStyle(Style.DEFAULT);
+    setFormat(new BasicFormatBuilder());
   }
 
   @Override
@@ -137,7 +172,7 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
 
   private Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
-    CSVFormat format = getStyle().createFormat();
+    CSVFormat format = getFormat().createFormat();
 
     try (Reader in = msg.getReader()) {
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -186,15 +221,15 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
     return getElementNamesFromFirstRecord() != null ? getElementNamesFromFirstRecord().booleanValue() : false;
   }
 
-  public Style getStyle() {
-    return style;
+  public FormatBuilder getFormat() {
+    return format;
   }
 
-  public void setStyle(Style csvFormat) {
+  public void setFormat(FormatBuilder csvFormat) {
     if (csvFormat == null) {
-      throw new IllegalArgumentException("Style may not be null");
+      throw new IllegalArgumentException("DocumentFormatBuilder may not be null");
     }
-    this.style = csvFormat;
+    this.format = csvFormat;
   }
 
   public Boolean getStripIllegalXmlChars() {

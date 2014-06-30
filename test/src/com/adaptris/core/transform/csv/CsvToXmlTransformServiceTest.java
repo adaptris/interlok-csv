@@ -7,7 +7,6 @@ import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.transform.TransformServiceExample;
-import com.adaptris.core.transform.csv.SimpleCsvToXmlTransformService.Style;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.util.text.xml.XPath;
 
@@ -70,22 +69,19 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals(true, svc.stripIllegalXmlChars());
   }
 
-  public void testSetStyle() throws Exception {
+  public void testSetDocumentFormatBuilder() throws Exception {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
-    assertNotNull(svc.getStyle());
-    assertEquals(Style.DEFAULT, svc.getStyle());
-
-    svc.setStyle(Style.EXCEL);
-    assertEquals(Style.EXCEL, svc.getStyle());
+    assertNotNull(svc.getFormat());
+    assertEquals(BasicFormatBuilder.class, svc.getFormat().getClass());
 
     try {
-      svc.setStyle(null);
+      svc.setFormat(null);
       fail();
     }
     catch (IllegalArgumentException e) {
 
     }
-    assertEquals(Style.EXCEL, svc.getStyle());
+    assertEquals(BasicFormatBuilder.class, svc.getFormat().getClass());
   }
 
   public void testSetElementNamesFromHeader() throws Exception {
@@ -125,7 +121,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_RFC4180() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
-    svc.setStyle(Style.RFC4180);
+    svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.RFC4180));
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, null);
@@ -138,7 +134,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_Excel() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
-    svc.setStyle(Style.EXCEL);
+    svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.EXCEL));
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, null);
@@ -151,7 +147,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_TabDelimiter() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_TAB);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
-    svc.setStyle(Style.TAB_DELIMITED);
+    svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.TAB_DELIMITED));
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, null);
@@ -164,7 +160,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_MySql() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_MYSQL);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
-    svc.setStyle(Style.MYSQL);
+    svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.MYSQL));
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, null);
