@@ -34,7 +34,7 @@ public class CustomFormatBuilder implements FormatBuilder {
     COMMENT {
       @Override
       CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withCommentStart(config.getCommentStart());
+        return current.withCommentMarker(config.getCommentStart());
       }      
     },
     ESCAPE {
