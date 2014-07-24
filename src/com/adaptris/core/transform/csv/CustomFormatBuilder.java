@@ -46,7 +46,7 @@ public class CustomFormatBuilder implements FormatBuilder {
     QUOTE {
       @Override
       CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withQuoteChar(config.getQuoteChar());
+        return current.withQuote(config.getQuoteChar());
       }
 
     },
