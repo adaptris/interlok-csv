@@ -1,5 +1,7 @@
 package com.adaptris.core.transform.csv;
 
+import java.lang.reflect.Method;
+
 import org.apache.commons.csv.CSVFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,44 +32,76 @@ public class CustomFormatBuilder implements FormatBuilder {
   private Boolean ignoreSurroundingSpaces;
   private String recordSeparator;
   
+  // These are to protect us mostly from API changes in the nightly build
+  // We call the appropriate methods reflectively.
+  private static final String[] COMMENT_MARKER_METHODS = {
+    "withCommentMarker", 
+    "withCommentStart"
+  };
+
+  private static final String[] QUOTE_CHAR_METHODS =
+  {
+      "withQuoteChar", "withQuote"
+  };
+
+  private static final String[] ESCAPE_CHAR_METHODS =
+  {
+      "withEscape", "withEscapeChar"
+  };
+
+  private static final String[] IGNORE_EMPTY_LINES_METHODS =
+  {
+    "withIgnoreEmptyLines"
+  };
+
+  private static final String[] IGNORE_SURROUNDING_LINES_METHODS =
+  {
+    "withIgnoreSurroundingSpaces"
+  };
+
+  private static final String[] RECORD_SEPARATOR_METHODS =
+  {
+    "withRecordSeparator"
+  };
+
   private enum FormatOptions {
-    COMMENT {
+    COMMENT_MARKER {
       @Override
       CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withCommentMarker(config.getCommentStart());
+        return configureCSV(current, COMMENT_MARKER_METHODS, Character.class, this, config.getCommentStart());
       }      
     },
-    ESCAPE {
+    ESCAPE_CHARACTER {
       @Override
       CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withEscape(config.getEscape());
+        return configureCSV(current, ESCAPE_CHAR_METHODS, Character.class, this, config.getEscape());
       }
     },
-    QUOTE {
+    QUOTE_CHARACTER {
       @Override
       CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withQuote(config.getQuoteChar());
-      }
-
-    },
-    IGNORE_EMPTY {
-      @Override
-      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withIgnoreEmptyLines(config.ignoreEmptyLines());
+        return configureCSV(current, QUOTE_CHAR_METHODS, Character.class, this, config.getQuoteChar());
       }
 
     },
-    TRIM {
+    IGNORE_EMPTY_LINES {
       @Override
       CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withIgnoreSurroundingSpaces(config.ignoreSurroundingSpaces());
+        return configureCSV(current, IGNORE_EMPTY_LINES_METHODS, boolean.class, this, config.ignoreEmptyLines());
+      }
+
+    },
+    IGNORE_SURROUNDING_SPACES {
+      @Override
+      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
+        return configureCSV(current, IGNORE_SURROUNDING_LINES_METHODS, boolean.class, this, config.ignoreSurroundingSpaces());
       }
 
     },
     RECORD_SEPARATOR {
       @Override
       CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return current.withRecordSeparator(config.recordSeparator());
+        return configureCSV(current, RECORD_SEPARATOR_METHODS, String.class, this, config.recordSeparator());
       }
 
     };
@@ -174,5 +208,34 @@ public class CustomFormatBuilder implements FormatBuilder {
 
   String recordSeparator() {
     return getRecordSeparator() != null ? getRecordSeparator() : DEFAULT_RECORD_SEPARATOR;
+  }
+
+  private static CSVFormat configureCSV(CSVFormat obj, String[] candidates, Class type, FormatOptions option, Object value) {
+    CSVFormat result = obj;
+    Method m = findMethod(CSVFormat.class, candidates, type);
+    if (m == null) {
+      throw new UnsupportedOperationException("Cannot find appropriate method to handle " + option.name());
+    }
+    try {
+      result = (CSVFormat) m.invoke(obj, value);
+    }
+    catch (Exception e) {
+      throw new UnsupportedOperationException("Cannot find appropriate method to handle " + option.name());
+    }
+    return result;
+  }
+
+  private static Method findMethod(Class c, String[] candidates, Class type) {
+    Method result = null;
+    for (String m : candidates) {
+      try {
+        result = c.getMethod(m, type);
+        break;
+      }
+      catch (NoSuchMethodException e) {
+      }
+    }
+
+    return result;
   }
 }
