@@ -184,7 +184,6 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
       CSVParser parser = format.parse(in);
       List<CSVRecord> records = parser.getRecords();
       List<String> elemNames = elemNamesFirstRec() ? createElementNames(records.get(0)) : createElementNames(records.get(0).size());
-      System.err.println(elemNames);
       int index = elemNamesFirstRec() ? 1 : 0;
       Element root = doc.createElement(XML_ROOT_ELEMENT);
       doc.appendChild(root);
