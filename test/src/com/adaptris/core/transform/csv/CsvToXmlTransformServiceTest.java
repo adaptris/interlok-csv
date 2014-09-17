@@ -18,6 +18,11 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     (byte) 0x02
   });
 
+  private static final String CSV_INPUT_ILLEGAL_HEADER = "Name?,Order Date#,Date Attending,Total Paid" + ILLEGAL_XML_CHAR
+      + LINE_ENDING + "Record1,\"Sep 15, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
+      + "Record2,\"Sep 16, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
+      + "Record3,\"Sep 17, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING;
+
   private static final String CSV_INPUT = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
       + "Record1,\"Sep 15, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record2,\"Sep 16, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
@@ -54,7 +59,6 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     super(name);
   }
 
-
   public void testSetStripIllegalChars() throws Exception {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     assertNull(svc.getStripIllegalXmlChars());
@@ -63,7 +67,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setStripIllegalXmlChars(Boolean.TRUE);
     assertEquals(Boolean.TRUE, svc.getStripIllegalXmlChars());
     assertEquals(true, svc.stripIllegalXmlChars());
-    
+
     svc.setStripIllegalXmlChars(null);
     assertNull(svc.getStripIllegalXmlChars());
     assertEquals(true, svc.stripIllegalXmlChars());
@@ -104,6 +108,27 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
 
     svc.setOutputMessageEncoding("UTF-8");
     assertEquals("UTF-8", svc.getOutputMessageEncoding());
+  }
+
+  public void testDoService_IllegalHeaders() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
+    SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
+    svc.setStripIllegalXmlChars(false);
+    svc.setElementNamesFromFirstRecord(true);
+
+    try {
+      execute(svc, msg);
+      fail();
+    }
+    catch (Exception expected) {
+
+    }
+    msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
+    svc.setStripIllegalXmlChars(true);
+    execute(svc, msg);
+    XPath xpath = new XPath();
+    Document doc = XmlHelper.createDocument(msg, null);
+    assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/Order_Date_"));
   }
 
   public void testDoService_DefaultStyle() throws Exception {
@@ -243,7 +268,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setOutputMessageEncoding("ISO-8849-1");
     svc.setStripIllegalXmlChars(false);
     try {
-    execute(svc, msg);
+      execute(svc, msg);
       fail();
     }
     catch (ServiceException expected) {

@@ -43,7 +43,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * If {@link #setElementNamesFromFirstRecord(Boolean)} is true, then the first record is used to generate the element names;
  * otherwise names are auto-generated based on the count of fields in the first row. Results are undefined if subsequent record
  * contains more fields than the first record. If the first row contains a blank field then the <code>blank</code> is used as the
- * element name.
+ * element name. Note that if your header rows contains characters that would not be allowed in an standard XML element name then it
+ * will be replaced with an '_', so "Order Date" becomes "Order_Date".
  * </p>
  * <p>
  * For example, given an input document :
@@ -127,9 +128,9 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   // private static final String XML11 = "[^" + "\u0001-\uD7FF" + "\uE000-\uFFFD" + "\ud800\udc00-\udbff\udfff" + "]+";
 
   private static final String ILLEGAL_XML = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD" + "\ud800\udc00-\udbff\udfff" + "]";
-  private static final String[] INVALID_ELEMENT_NAMES =
+  private static final String[] INVALID_ELEMENT_CHARS =
   {
-      "\\\\", "\\?", "\\*", "\\:", " ", "\\|", "&", "\\\"", "\\'", "<", ">", "\\)", "\\(", "\\/"
+      "\\\\", "\\?", "\\*", "\\:", " ", "\\|", "&", "\\\"", "\\'", "<", ">", "\\)", "\\(", "\\/", "#"
   };
   private static final String ELEM_REPL_VALUE = "_";
 
@@ -287,7 +288,7 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
     return result;
   }
 
-  private static final List<String> createElementNames(CSVRecord hdr) {
+  private final List<String> createElementNames(CSVRecord hdr) {
     List<String> result = new ArrayList<>();
     for (String hdrValue : hdr) {
       result.add(safeElementName(hdrValue));
@@ -342,9 +343,10 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
     return encoding;
   }
 
-  private static String safeElementName(String input) {
+  private String safeElementName(String input) {
     String name = input;
-    for (String invalid : INVALID_ELEMENT_NAMES) {
+    name = stripIllegalXmlChars() ? name.replaceAll(ILLEGAL_XML, "") : name;
+    for (String invalid : INVALID_ELEMENT_CHARS) {
       name = name.replaceAll(invalid, ELEM_REPL_VALUE);
     }
     if (isEmpty(name)) {
