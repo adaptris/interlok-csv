@@ -20,7 +20,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("csv-custom-format")
 public class CustomFormatBuilder implements FormatBuilder {
 
-  private Logger log = LoggerFactory.getLogger(this.getClass());
+  private transient Logger log = LoggerFactory.getLogger(this.getClass());
   private static final Character COMMA = Character.valueOf(',');
   private static final String DEFAULT_RECORD_SEPARATOR = "\r\n";
 
