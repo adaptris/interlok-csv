@@ -140,6 +140,7 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   private FormatBuilder format;
   private Boolean stripIllegalXmlChars = null;
   private String outputMessageEncoding = null;
+  private Boolean uniqueRecordNames = null;
 
   public SimpleCsvToXmlTransformService() {
     this(new BasicFormatBuilder());
@@ -190,7 +191,7 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
       int recordCount = 1;
       while (index < records.size()) {
         CSVRecord next = records.get(index);
-        String recordName = CSV_RECORD_NAME + "-" + recordCount;
+        String recordName = CSV_RECORD_NAME + ((uniqueRecords()) ? "-" + recordCount : "");
         Element recordElement = addNewElement(doc, root, recordName);
         // Create the sub doc here.
         List<Element> csvFields = createFields(doc, records.get(index), elemNames);
@@ -352,5 +353,27 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
       name = "blank";
     }
     return name;
+  }
+
+  public Boolean getUniqueRecordNames() {
+    return uniqueRecordNames;
+  }
+  
+  /**
+   * Specify whether or not to have unique element names for each record in the CSV file.
+   * 
+   * <p>
+   * If there are multiple records in then each record can have a unique element name; e.g <code>record-1, record-2, record-3</code>
+   * and so on. If false, then they are all called <code>record</code>
+   * </p>
+   * 
+   * @param b true to generate a unique element name for each line in the CSV, default null (true)
+   */
+  public void setUniqueRecordNames(Boolean b) {
+    this.uniqueRecordNames = b;
+  }
+
+  boolean uniqueRecords() {
+    return getUniqueRecordNames() != null ? getUniqueRecordNames() : true;
   }
 }

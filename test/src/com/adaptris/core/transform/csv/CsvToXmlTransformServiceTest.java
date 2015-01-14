@@ -143,6 +143,19 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getCharEncoding());
   }
 
+  public void testDoService_NonUniqueRecords() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
+    svc.setUniqueRecordNames(false);
+    execute(svc, msg);
+    XPath xpath = new XPath();
+    Document doc = XmlHelper.createDocument(msg, null);
+    assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/csv-field-2"));
+    assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/csv-field-2"));
+    assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[3]/csv-field-2"));
+    assertEquals("UTF-8", msg.getCharEncoding());
+  }
+
   public void testDoService_RFC4180() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
