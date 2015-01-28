@@ -183,22 +183,29 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
       CSVParser parser = format.parse(in);
-      List<CSVRecord> records = parser.getRecords();
-      List<String> elemNames = elemNamesFirstRec() ? createElementNames(records.get(0)) : createElementNames(records.get(0).size());
-      int index = elemNamesFirstRec() ? 1 : 0;
+      int recordCount = 1;
+      boolean firstRecord = true;
+      List<String> elemNames = null;
       Element root = doc.createElement(XML_ROOT_ELEMENT);
       doc.appendChild(root);
-      int recordCount = 1;
-      while (index < records.size()) {
-        CSVRecord next = records.get(index);
+      for (CSVRecord record : parser) {
+        if (firstRecord) {
+          firstRecord = false;
+          if (elemNamesFirstRec()) {
+            elemNames = createElementNames(record);
+            continue;
+          }
+          else {
+            elemNames = createElementNames(record.size());
+          }
+        }
         String recordName = CSV_RECORD_NAME + ((uniqueRecords()) ? "-" + recordCount : "");
         Element recordElement = addNewElement(doc, root, recordName);
         // Create the sub doc here.
-        List<Element> csvFields = createFields(doc, records.get(index), elemNames);
+        List<Element> csvFields = createFields(doc, record, elemNames);
         for (Element field : csvFields) {
           recordElement.appendChild(field);
         }
-        index++;
         recordCount++;
       }
     }

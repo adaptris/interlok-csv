@@ -289,10 +289,11 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     }
   }
 
-  public void testDoService_NotXml() throws Exception {
+  public void testDoService_NotCSV() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("<hello>\nabc,def</hello>");
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     try {
+      // This fails because the 2nd record has "more fields" than the first.
       execute(svc, msg);
       fail();
     }
