@@ -113,17 +113,6 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_IllegalHeaders() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
-    svc.setStripIllegalXmlChars(false);
-    svc.setElementNamesFromFirstRecord(true);
-
-    try {
-      execute(svc, msg);
-      fail();
-    }
-    catch (Exception expected) {
-
-    }
-    msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
     svc.setStripIllegalXmlChars(true);
     execute(svc, msg);
     XPath xpath = new XPath();
