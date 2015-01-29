@@ -23,6 +23,7 @@ import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.ServiceImp;
 import com.adaptris.core.transform.FfTransformService;
+import com.adaptris.core.util.XmlHelper;
 import com.adaptris.util.XmlUtils;
 import com.adaptris.util.license.License;
 import com.adaptris.util.license.License.LicenseType;
@@ -117,22 +118,6 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   private static final String CSV_RECORD_NAME = "record";
   private static final String XML_ROOT_ELEMENT = "csv-xml";
   private static final String CSV_FIELD_NAME = "csv-field";
-
-  // XML 1.0
-  // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-  // private static final String XML10 = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD" + "\ud800\udc00-\udbff\udfff"
-  // + "]";
-
-  // XML 1.1
-  // [#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-  // private static final String XML11 = "[^" + "\u0001-\uD7FF" + "\uE000-\uFFFD" + "\ud800\udc00-\udbff\udfff" + "]+";
-
-  private static final String ILLEGAL_XML = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD" + "\ud800\udc00-\udbff\udfff" + "]";
-  private static final String[] INVALID_ELEMENT_CHARS =
-  {
-      "\\\\", "\\?", "\\*", "\\:", " ", "\\|", "&", "\\\"", "\\'", "<", ">", "\\)", "\\(", "\\/", "#"
-  };
-  private static final String ELEM_REPL_VALUE = "_";
 
   private Boolean elementNamesFromFirstRecord;
   @NotNull
@@ -314,7 +299,7 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   }
 
   private Node createTextNode(Document doc, String value) {
-    String munged = stripIllegalXmlChars() ? value.replaceAll(ILLEGAL_XML, "") : value;
+    String munged = stripIllegalXmlChars() ? XmlHelper.stripIllegalXmlCharacters(value) : value;
     return doc.createTextNode(munged);
   }
 
@@ -351,15 +336,7 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   }
 
   private String safeElementName(String input) {
-    String name = input;
-    name = stripIllegalXmlChars() ? name.replaceAll(ILLEGAL_XML, "") : name;
-    for (String invalid : INVALID_ELEMENT_CHARS) {
-      name = name.replaceAll(invalid, ELEM_REPL_VALUE);
-    }
-    if (isEmpty(name)) {
-      name = "blank";
-    }
-    return name;
+    return XmlHelper.safeElementName(input, "blank");
   }
 
   public Boolean getUniqueRecordNames() {
