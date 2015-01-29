@@ -114,6 +114,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setStripIllegalXmlChars(true);
+    svc.setElementNamesFromFirstRecord(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, null);
