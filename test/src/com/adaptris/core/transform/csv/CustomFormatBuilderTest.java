@@ -2,8 +2,10 @@ package com.adaptris.core.transform.csv;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.apache.commons.csv.CSVFormat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,9 +34,9 @@ public class CustomFormatBuilderTest {
     assertNull(builder.getDelimiter());
     assertEquals(Character.valueOf(','), builder.delimiter());
     // Test might fail if they change the API (yet again)
-    // assertNotNull(builder.createFormat());
-    // CSVFormat format = builder.createFormat();
-    // assertEquals(',', format.getDelimiter());
+    assertNotNull(builder.createFormat());
+    CSVFormat format = builder.createFormat();
+    assertEquals(',', format.getDelimiter());
   }
 
   @Test
@@ -43,7 +45,7 @@ public class CustomFormatBuilderTest {
     assertNull(builder.getCommentStart());
     builder.setCommentStart('a');
     assertEquals(Character.valueOf('a'), builder.getCommentStart());
-    // assertNotNull(builder.createFormat());
+    assertNotNull(builder.createFormat());
   }
 
   @Test
@@ -52,7 +54,7 @@ public class CustomFormatBuilderTest {
     assertNull(builder.getEscape());
     builder.setEscape('a');
     assertEquals(Character.valueOf('a'), builder.getEscape());
-    // assertNotNull(builder.createFormat());
+    assertNotNull(builder.createFormat());
   }
 
   @Test
@@ -61,7 +63,7 @@ public class CustomFormatBuilderTest {
     assertNull(builder.getQuoteChar());
     builder.setQuoteChar('a');
     assertEquals(Character.valueOf('a'), builder.getQuoteChar());
-    // assertNotNull(builder.createFormat());
+    assertNotNull(builder.createFormat());
   }
 
   @Test
@@ -69,16 +71,16 @@ public class CustomFormatBuilderTest {
     CustomFormatBuilder builder = new CustomFormatBuilder();
     assertNull(builder.getIgnoreEmptyLines());
     assertFalse(builder.ignoreEmptyLines());
-    
+
     builder.setIgnoreEmptyLines(Boolean.FALSE);
     assertEquals(Boolean.FALSE, builder.getIgnoreEmptyLines());
     assertFalse(builder.ignoreEmptyLines());
-    
+
     builder.setIgnoreEmptyLines(null);
     assertNull(builder.getIgnoreEmptyLines());
     assertFalse(builder.ignoreEmptyLines());
 
-    // assertNotNull(builder.createFormat());
+    assertNotNull(builder.createFormat());
   }
 
   @Test
@@ -95,7 +97,7 @@ public class CustomFormatBuilderTest {
     assertNull(builder.getIgnoreSurroundingSpaces());
     assertFalse(builder.ignoreSurroundingSpaces());
 
-    // assertNotNull(builder.createFormat());
+    assertNotNull(builder.createFormat());
   }
 
   @Test
@@ -111,7 +113,7 @@ public class CustomFormatBuilderTest {
     assertNull(builder.getRecordSeparator());
     assertEquals("\r\n", builder.recordSeparator());
 
-    // assertNotNull(builder.createFormat());
+    assertNotNull(builder.createFormat());
   }
 
 }
