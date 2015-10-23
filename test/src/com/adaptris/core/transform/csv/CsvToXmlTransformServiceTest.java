@@ -7,6 +7,7 @@ import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.transform.TransformServiceExample;
+import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.util.text.xml.XPath;
 
@@ -117,7 +118,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setElementNamesFromFirstRecord(true);
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/Order_Date_"));
   }
 
@@ -126,7 +127,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-3/csv-field-2"));
@@ -139,7 +140,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setUniqueRecordNames(false);
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[3]/csv-field-2"));
@@ -152,7 +153,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.RFC4180));
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-3/csv-field-2"));
@@ -165,7 +166,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.EXCEL));
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-3/csv-field-2"));
@@ -178,7 +179,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.TAB_DELIMITED));
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-3/csv-field-2"));
@@ -191,7 +192,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.MYSQL));
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("\"Sep 15, 2012\"", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("UTF-8", msg.getCharEncoding());
@@ -208,7 +209,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService(builder);
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-3/csv-field-2"));
@@ -221,7 +222,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setElementNamesFromFirstRecord(true);
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/Order_Date"));
     assertEquals("UTF-8", msg.getCharEncoding());
   }
@@ -232,7 +233,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setElementNamesFromFirstRecord(true);
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/blank"));
     assertEquals("UTF-8", msg.getCharEncoding());
   }
@@ -244,7 +245,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-3/csv-field-2"));
@@ -258,7 +259,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setStripIllegalXmlChars(false);
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Order Date", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/csv-field-2"));
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-2"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-3/csv-field-2"));
@@ -299,7 +300,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     execute(svc, msg);
     try {
       // This should fail.
-      Document doc = XmlHelper.createDocument(msg, null);
+      Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
       fail();
     }
     catch (Exception expected) {
@@ -309,7 +310,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     svc.setStripIllegalXmlChars(true);
     execute(svc, msg);
     XPath xpath = new XPath();
-    Document doc = XmlHelper.createDocument(msg, null);
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("", xpath.selectSingleTextItem(doc, "/csv-xml/record-2/csv-field-4"));
   }
 
