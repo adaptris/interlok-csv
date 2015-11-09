@@ -22,11 +22,8 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.ServiceImp;
-import com.adaptris.core.transform.FfTransformService;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.util.XmlUtils;
-import com.adaptris.util.license.License;
-import com.adaptris.util.license.License.LicenseType;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -136,8 +133,15 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   }
 
   @Override
-  public void init() throws CoreException {
+  protected void initService() throws CoreException {}
+
+  @Override
+  protected void closeService() {
+
   }
+
+  @Override
+  public void prepare() throws CoreException {}
 
   @Override
   public void doService(AdaptrisMessage msg) throws ServiceException {
@@ -150,15 +154,6 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
     }
   }
 
-  @Override
-  public void close() {
-
-  }
-
-  @Override
-  public boolean isEnabled(License license) throws CoreException {
-    return license.isEnabled(LicenseType.Basic);
-  }
 
   private Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
