@@ -17,7 +17,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
@@ -110,6 +112,8 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  * 
  */
 @XStreamAlias("simple-csv-to-xml-transform")
+@AdapterComponent
+@ComponentProfile(summary = "Easily transform a document from CSV to XML", tag = "service,transform,csv,xml")
 public class SimpleCsvToXmlTransformService extends ServiceImp {
 
   private static final String CSV_RECORD_NAME = "record";
