@@ -30,6 +30,8 @@
     <dependency org="com.adaptris" name="adp-core" rev="${adp-core-version}" conf="compile->default" changing="true"/>
     <dependency org="com.adaptris" name="adp-stubs" rev="${adp-core-version}" changing="true" conf="test->default"/>
     <dependency org="org.apache.commons" name="commons-csv" rev="1.1" conf="compile->default"/>
+    <dependency org="net.sf.supercsv" name="super-csv" rev="2.4.0" conf="compile->default"/>
+    
     <dependency org="com.adaptris" name="adp-core-apt" rev="${adp-core-version}" conf="compile->default;ant->default" changing="true"/>
 
     <dependency org="org.apache.velocity" name="velocity" rev="1.7" transitive="false" conf="compile->default"/>
@@ -39,7 +41,11 @@
     <dependency org="log4j" name="log4j" rev="1.2.17" force="true" conf="test->default;ant->default"/>
 
     <dependency org="junit" name="junit" rev="4.11" conf="test->default"/>
-
+    <dependency org="org.apache.derby" name="derby" rev="10.10.1.1" conf="test->default"/>
+    <!--
+    <dependency org="org.postgresql" name="postgresql" rev="9.3-1102-jdbc41" conf="runtime->default"/>
+    <dependency org="mysql" name="mysql-connector-java" rev="5.1.30" conf="runtime->default"/>
+    -->
     <!-- For Various ANT Tasks -->
     <dependency org="ant-contrib" name="ant-contrib" rev="1.0b3" conf="ant->default" transitive="false"/>
     <dependency org="com.yworks"  name="yguard" rev="2.5.2" conf="ant->default" transitive="false"/>
