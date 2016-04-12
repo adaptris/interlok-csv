@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.StringUtils;
 import org.supercsv.io.CsvListWriter;
 
 import com.adaptris.annotation.AutoPopulated;
@@ -16,7 +17,6 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.services.jdbc.ResultSetTranslator;
 import com.adaptris.core.services.jdbc.ResultSetTranslatorImp;
 import com.adaptris.core.util.Args;
-import com.adaptris.core.util.XmlHelper;
 import com.adaptris.jdbc.JdbcResult;
 import com.adaptris.jdbc.JdbcResultRow;
 import com.adaptris.jdbc.JdbcResultSet;
@@ -81,7 +81,7 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
     List<String> result = new ArrayList<>();
     for (int i = 0; i < row.getFieldCount(); i++) {
       String columnName = row.getFieldName(i);
-      String hdrName = getColumnNameStyle().format(XmlHelper.safeElementName(columnName, ELEMENT_NAME_COLUMN + (i + 1)));
+      String hdrName = getColumnNameStyle().format(StringUtils.defaultIfBlank(columnName, ELEMENT_NAME_COLUMN + (i + 1)));
       result.add(hdrName);
     }
     return result;
