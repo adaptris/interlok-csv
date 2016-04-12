@@ -71,7 +71,14 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertEquals(11, lines.size());
   }
 
-  public void populateDB(String url, int count) throws Exception {
+  @Override
+  protected String createBaseFileName(Object o) {
+    JdbcDataQueryService sc = (JdbcDataQueryService) o;
+    String name = super.createBaseFileName(o) + "-" + sc.getResultSetTranslator().getClass().getSimpleName();
+    return name;
+  }
+
+  private void populateDB(String url, int count) throws Exception {
     Connection c = null;
     Statement s = null;
     PreparedStatement insert = null;
