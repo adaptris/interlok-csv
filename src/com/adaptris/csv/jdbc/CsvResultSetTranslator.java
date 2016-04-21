@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.supercsv.io.CsvListWriter;
 
@@ -34,6 +35,8 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
   @NotNull
   @AutoPopulated
   private PreferenceBuilder preferenceBuilder;
+  
+  private String excludeColumns;
 
   public CsvResultSetTranslator() {
     setPreferenceBuilder(new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.STANDARD_PREFERENCE));
@@ -57,15 +60,20 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
   @Override
   public void translate(JdbcResult source, AdaptrisMessage target) throws SQLException, ServiceException {
     boolean first = true;
+    int[] excludedIndexes = null;
     try (CsvListWriter csvWriter = new CsvListWriter(target.getWriter(), getPreferenceBuilder().build())) {
       for (JdbcResultSet r : source.getResultSets()) {
         for (JdbcResultRow row : r.getRows()) {
           if (first) {
-            csvWriter.writeHeader(createHeaderNames(row).toArray(new String[0]));
+            excludedIndexes = createExcludedIndexes(row);
+            csvWriter.writeHeader(createHeaderNames(row, excludedIndexes).toArray(new String[0]));
             first = false;
           }
           List<String> values = new ArrayList<>();
           for (int i = 0; i < row.getFieldCount(); i++) {
+            if(ArrayUtils.contains(excludedIndexes, i)) {
+              continue;
+            }
             values.add(toString(row, i));
           }
           // Write each row to the msg.
@@ -77,9 +85,29 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
     }
   }
 
-  private List<String> createHeaderNames(JdbcResultRow row) throws SQLException {
+  private int[] createExcludedIndexes(JdbcResultRow row) {
+    if(getExcludeColumns() == null) {
+      return new int[0];
+    }
+    
+    final String[] excludedColumns = getExcludeColumns().split(",");
+    int[] result = new int[excludedColumns.length];
+    int r=0;
+    for(int i = 0; i < row.getFieldCount(); i++) {
+      String columnName = row.getFieldName(i);
+      if(ArrayUtils.contains(excludedColumns, columnName)) {
+        result[r++] = i;
+      };
+    }
+    return result;
+  }
+  
+  private List<String> createHeaderNames(JdbcResultRow row, int[] excludedIndexes) throws SQLException {
     List<String> result = new ArrayList<>();
     for (int i = 0; i < row.getFieldCount(); i++) {
+      if(ArrayUtils.contains(excludedIndexes, i)) {
+        continue;
+      }
       String columnName = row.getFieldName(i);
       String hdrName = getColumnNameStyle().format(StringUtils.defaultIfBlank(columnName, ELEMENT_NAME_COLUMN + (i + 1)));
       result.add(hdrName);
@@ -99,6 +127,20 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
    */
   public void setPreferenceBuilder(PreferenceBuilder formatBuilder) {
     this.preferenceBuilder = Args.notNull(formatBuilder, "preference-builder");
+  }
+
+  /**
+   * @return comma separated list of columns to exclude from the result
+   */
+  public String getExcludeColumns() {
+    return excludeColumns;
+  }
+
+  /**
+   * @param excludeColumns comma separated list of columns to exclude from the result
+   */
+  public void setExcludeColumns(String excludeColumns) {
+    this.excludeColumns = excludeColumns;
   }
 
 
