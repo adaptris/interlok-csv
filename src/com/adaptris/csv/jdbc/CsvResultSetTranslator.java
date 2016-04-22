@@ -36,7 +36,7 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
   @AutoPopulated
   private PreferenceBuilder preferenceBuilder;
   
-  private String excludeColumns;
+  private ColumnFilter columnFilter;
 
   public CsvResultSetTranslator() {
     setPreferenceBuilder(new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.STANDARD_PREFERENCE));
@@ -65,7 +65,7 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
       for (JdbcResultSet r : source.getResultSets()) {
         for (JdbcResultRow row : r.getRows()) {
           if (first) {
-            excludedIndexes = createExcludedIndexes(row);
+            excludedIndexes = createExcludedIndexes(target, row);
             csvWriter.writeHeader(createHeaderNames(row, excludedIndexes).toArray(new String[0]));
             first = false;
           }
@@ -85,17 +85,17 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
     }
   }
 
-  private int[] createExcludedIndexes(JdbcResultRow row) {
-    if(getExcludeColumns() == null) {
+  private int[] createExcludedIndexes(AdaptrisMessage msg, JdbcResultRow row) {
+    if(getColumnFilter() == null) {
       return new int[0];
     }
     
-    final String[] excludedColumns = getExcludeColumns().split(",");
-    int[] result = new int[excludedColumns.length];
+    final List<String> excludedColumns = getColumnFilter().getFilteredColumnNames(msg);
+    int[] result = new int[excludedColumns.size()];
     int r=0;
     for(int i = 0; i < row.getFieldCount(); i++) {
       String columnName = row.getFieldName(i);
-      if(ArrayUtils.contains(excludedColumns, columnName)) {
+      if(excludedColumns.contains(columnName)) {
         result[r++] = i;
       };
     }
@@ -129,19 +129,15 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
     this.preferenceBuilder = Args.notNull(formatBuilder, "preference-builder");
   }
 
-  /**
-   * @return comma separated list of columns to exclude from the result
-   */
-  public String getExcludeColumns() {
-    return excludeColumns;
+  public ColumnFilter getColumnFilter() {
+    return columnFilter;
   }
 
   /**
-   * @param excludeColumns comma separated list of columns to exclude from the result
+   * @param columnFilter Optional filter for columns that should not be output
    */
-  public void setExcludeColumns(String excludeColumns) {
-    this.excludeColumns = excludeColumns;
+  public void setColumnFilter(ColumnFilter columnFilter) {
+    this.columnFilter = columnFilter;
   }
-
 
 }

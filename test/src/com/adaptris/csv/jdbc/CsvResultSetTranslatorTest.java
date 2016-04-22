@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -44,7 +46,8 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
       connection.setConnectionRetryInterval(new TimeInterval(3L, "SECONDS"));
       service.setConnection(connection);
       CsvResultSetTranslator rst = new CsvResultSetTranslator();
-      rst.setExcludeColumns("some,columns,to,exclude");
+      ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
+      ccf.setFilteredColumns(Arrays.asList(new String[] {"some","columns","to","exclude"}));
       service.setResultSetTranslator(rst);
       service.setStatement("SELECT StringColumn1, StringColumn2 FROM tablename WHERE ID = 123");
     } catch (Exception e) {
@@ -78,7 +81,9 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     con.setDriverImp("org.apache.derby.jdbc.EmbeddedDriver");
 
     CsvResultSetTranslator rst = new CsvResultSetTranslator();
-    rst.setExcludeColumns("ADAPTER_UNIQUE_ID");
+    ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
+    ccf.setFilteredColumns(Collections.singletonList("ADAPTER_UNIQUE_ID"));
+    rst.setColumnFilter(ccf);
     
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
@@ -100,13 +105,41 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     con.setDriverImp("org.apache.derby.jdbc.EmbeddedDriver");
 
     CsvResultSetTranslator rst = new CsvResultSetTranslator();
-    rst.setExcludeColumns("ADAPTER_UNIQUE_ID,MESSAGE_TRANSLATOR_TYPE");
+    ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
+    ccf.setFilteredColumns(Arrays.asList(new String[] {"ADAPTER_UNIQUE_ID","MESSAGE_TRANSLATOR_TYPE"}));
+    rst.setColumnFilter(ccf);
     
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
     s.setStatement("select * from data");
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    execute(s, msg);
+    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    assertEquals(11, lines.size());
+    assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
+    assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
+    assertEquals(1, lines.get(1).split(",").length);
+  }
+  
+  public void testResultSetToCSVWithMetadataExclusions() throws Exception {
+    String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
+    populateDB(url, 10);
+    JdbcConnection con = new JdbcConnection();
+    con.setConnectUrl(url);
+    con.setDriverImp("org.apache.derby.jdbc.EmbeddedDriver");
+
+    CsvResultSetTranslator rst = new CsvResultSetTranslator();
+    MetadataColumnFilter mcf = new MetadataColumnFilter();
+    mcf.setMetadataKeys(Collections.singletonList("key"));
+    rst.setColumnFilter(mcf);
+    
+    JdbcDataQueryService s = new JdbcDataQueryService();
+    s.setConnection(con);
+    s.setStatement("select * from data");
+    s.setResultSetTranslator(rst);
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    msg.addMetadata("key", "ADAPTER_UNIQUE_ID,MESSAGE_TRANSLATOR_TYPE");
     execute(s, msg);
     List<String> lines = IOUtils.readLines(msg.getInputStream());
     assertEquals(11, lines.size());
