@@ -1,2 +1,2 @@
 junit.TransformServiceExamples.baseDir=${basedir}/build/example-xml
-
+junit.ServiceCase.baseDir=${basedir}/build/example-xml
