@@ -1,9 +1,26 @@
 package com.adaptris.csv.jdbc;
 
-import java.util.List;
+import java.util.Set;
 
 import com.adaptris.core.AdaptrisMessage;
 
+/**
+ * A simple column filter for CSV output.
+ * 
+ * @author lchan
+ *
+ */
 public interface ColumnFilter {
-  public List<String> getFilteredColumnNames(AdaptrisMessage msg);
+  /**
+   * The list of columns that will be filtered.
+   * 
+   */
+  public Set<String> getExcludeColumnNames(AdaptrisMessage msg);
+
+  /**
+   * The list of columsn that will be explicitly included.
+   * 
+   */
+  public Set<String> getIncludeColumnNames(AdaptrisMessage msg);
+
 }
