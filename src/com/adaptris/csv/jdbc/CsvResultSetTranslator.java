@@ -3,11 +3,13 @@ package com.adaptris.csv.jdbc;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.supercsv.io.CsvListWriter;
 
@@ -60,18 +62,19 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
   @Override
   public void translate(JdbcResult source, AdaptrisMessage target) throws SQLException, ServiceException {
     boolean first = true;
-    int[] excludedIndexes = null;
+    Set<Integer> excludedIndexes = new HashSet<>();
     try (CsvListWriter csvWriter = new CsvListWriter(target.getWriter(), getPreferenceBuilder().build())) {
       for (JdbcResultSet r : source.getResultSets()) {
         for (JdbcResultRow row : r.getRows()) {
           if (first) {
-            excludedIndexes = createExcludedIndexes(target, row);
+            excludedIndexes.addAll(negatedInclusionIndexes(target, row));
+            excludedIndexes.addAll(createExcludedIndexes(target, row));
             csvWriter.writeHeader(createHeaderNames(row, excludedIndexes).toArray(new String[0]));
             first = false;
           }
           List<String> values = new ArrayList<>();
           for (int i = 0; i < row.getFieldCount(); i++) {
-            if(ArrayUtils.contains(excludedIndexes, i)) {
+            if (excludedIndexes.contains(i)) {
               continue;
             }
             values.add(toString(row, i));
@@ -85,27 +88,48 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
     }
   }
 
-  private int[] createExcludedIndexes(AdaptrisMessage msg, JdbcResultRow row) {
+  private Collection<Integer> createExcludedIndexes(AdaptrisMessage msg, JdbcResultRow row) {
     if(getColumnFilter() == null) {
-      return new int[0];
+      return new ArrayList<Integer>();
     }
     
-    final List<String> excludedColumns = getColumnFilter().getFilteredColumnNames(msg);
-    int[] result = new int[excludedColumns.size()];
-    int r=0;
+    final Set<String> excludedColumns = getColumnFilter().getExcludeColumnNames(msg);
+    List<Integer> result = new ArrayList<>();
     for(int i = 0; i < row.getFieldCount(); i++) {
       String columnName = row.getFieldName(i);
       if(excludedColumns.contains(columnName)) {
-        result[r++] = i;
+        result.add(i);
       };
     }
     return result;
   }
   
-  private List<String> createHeaderNames(JdbcResultRow row, int[] excludedIndexes) throws SQLException {
+  // Check all the column names, if they don't match the list of columns to include, then add them
+  // to the exclusion list.
+  // The specia case is if there are no include columns, then it's implicitly include all.
+  private Collection<Integer> negatedInclusionIndexes(AdaptrisMessage msg, JdbcResultRow row) {
+    if (getColumnFilter() == null) {
+      return new ArrayList<Integer>();
+    }
+
+    final Set<String> columnsToInclude = getColumnFilter().getIncludeColumnNames(msg);
+    if (columnsToInclude.size() == 0) {
+      return new ArrayList<Integer>();
+    }
+    List<Integer> result = new ArrayList<>();
+    for (int i = 0; i < row.getFieldCount(); i++) {
+      String columnName = row.getFieldName(i);
+      if (!columnsToInclude.contains(columnName)) {
+        result.add(i);
+      }
+    }
+    return result;
+  }
+
+  private List<String> createHeaderNames(JdbcResultRow row, Collection<Integer> excludedIndexes) throws SQLException {
     List<String> result = new ArrayList<>();
     for (int i = 0; i < row.getFieldCount(); i++) {
-      if(ArrayUtils.contains(excludedIndexes, i)) {
+      if (excludedIndexes.contains(i)) {
         continue;
       }
       String columnName = row.getFieldName(i);

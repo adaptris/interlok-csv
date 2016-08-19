@@ -47,7 +47,8 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
       service.setConnection(connection);
       CsvResultSetTranslator rst = new CsvResultSetTranslator();
       ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
-      ccf.setFilteredColumns(Arrays.asList(new String[] {"some","columns","to","exclude"}));
+      ccf.setExcludeColumns(Arrays.asList(new String[] {"some","columns","to","exclude"}));
+      rst.setColumnFilter(ccf);
       service.setResultSetTranslator(rst);
       service.setStatement("SELECT StringColumn1, StringColumn2 FROM tablename WHERE ID = 123");
     } catch (Exception e) {
@@ -82,7 +83,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     CsvResultSetTranslator rst = new CsvResultSetTranslator();
     ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
-    ccf.setFilteredColumns(Collections.singletonList("ADAPTER_UNIQUE_ID"));
+    ccf.setExcludeColumns(Collections.singletonList("adapter_unique_id"));
     rst.setColumnFilter(ccf);
     
     JdbcDataQueryService s = new JdbcDataQueryService();
@@ -96,6 +97,31 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
     assertEquals(2, lines.get(1).split(",").length);
   }
+
+  public void testResultSetToCSVWithInclusions() throws Exception {
+    String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
+    populateDB(url, 10);
+    JdbcConnection con = new JdbcConnection();
+    con.setConnectUrl(url);
+    con.setDriverImp("org.apache.derby.jdbc.EmbeddedDriver");
+
+    CsvResultSetTranslator rst = new CsvResultSetTranslator();
+    ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
+    ccf.setIncludeColumns(Arrays.asList(new String[] {"ADAPTER_VERSION", "MESSAGE_TRANSLATOR_TYPE"}));
+    rst.setColumnFilter(ccf);
+
+    JdbcDataQueryService s = new JdbcDataQueryService();
+    s.setConnection(con);
+    s.setStatement("select * from data");
+    s.setResultSetTranslator(rst);
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    execute(s, msg);
+    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    assertEquals(11, lines.size());
+    assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
+    assertEquals(2, lines.get(1).split(",").length);
+  }
+
   
   public void testResultSetToCSVWith2Exclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
@@ -106,7 +132,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     CsvResultSetTranslator rst = new CsvResultSetTranslator();
     ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
-    ccf.setFilteredColumns(Arrays.asList(new String[] {"ADAPTER_UNIQUE_ID","MESSAGE_TRANSLATOR_TYPE"}));
+    ccf.setExcludeColumns(Arrays.asList(new String[] {"ADAPTER_UNIQUE_ID", "MESSAGE_TRANSLATOR_TYPE"}));
     rst.setColumnFilter(ccf);
     
     JdbcDataQueryService s = new JdbcDataQueryService();
@@ -131,7 +157,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     CsvResultSetTranslator rst = new CsvResultSetTranslator();
     MetadataColumnFilter mcf = new MetadataColumnFilter();
-    mcf.setMetadataKeys(Collections.singletonList("key"));
+    mcf.setExclusionKeys(Collections.singletonList("key"));
     rst.setColumnFilter(mcf);
     
     JdbcDataQueryService s = new JdbcDataQueryService();
@@ -147,6 +173,64 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
     assertEquals(1, lines.get(1).split(",").length);
   }
+
+
+  public void testResultSetToCSVWithMetadataInclusions() throws Exception {
+    String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
+    populateDB(url, 10);
+    JdbcConnection con = new JdbcConnection();
+    con.setConnectUrl(url);
+    con.setDriverImp("org.apache.derby.jdbc.EmbeddedDriver");
+
+    CsvResultSetTranslator rst = new CsvResultSetTranslator();
+    MetadataColumnFilter mcf = new MetadataColumnFilter();
+    mcf.setExclusionKeys(Collections.singletonList("exclusions"));
+    mcf.setInclusionKeys(Collections.singletonList("inclusions"));
+    rst.setColumnFilter(mcf);
+
+    JdbcDataQueryService s = new JdbcDataQueryService();
+    s.setConnection(con);
+    s.setStatement("select * from data");
+    s.setResultSetTranslator(rst);
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    msg.addMetadata("inclusions", "ADAPTER_VERSION");
+    execute(s, msg);
+    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    assertEquals(11, lines.size());
+    assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
+    assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
+    assertEquals(1, lines.get(1).split(",").length);
+  }
+
+  public void testResultSetToCSVWithMetadataInclusionsAndExclusions() throws Exception {
+    String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
+    populateDB(url, 10);
+    JdbcConnection con = new JdbcConnection();
+    con.setConnectUrl(url);
+    con.setDriverImp("org.apache.derby.jdbc.EmbeddedDriver");
+
+    CsvResultSetTranslator rst = new CsvResultSetTranslator();
+    MetadataColumnFilter mcf = new MetadataColumnFilter();
+    mcf.setExclusionKeys(Collections.singletonList("exclusions"));
+    mcf.setInclusionKeys(Collections.singletonList("inclusions"));
+    rst.setColumnFilter(mcf);
+
+    JdbcDataQueryService s = new JdbcDataQueryService();
+    s.setConnection(con);
+    s.setStatement("select * from data");
+    s.setResultSetTranslator(rst);
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    msg.addMetadata("inclusions", "ADAPTER_VERSION");
+    msg.addMetadata("exclusions", "adapter_unique_id,MESSAGE_TRANSLATOR_TYPE");
+    execute(s, msg);
+    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    assertEquals(11, lines.size());
+    assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
+    assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
+    assertEquals(1, lines.get(1).split(",").length);
+  }
+
+
 
   @Override
   protected String createBaseFileName(Object o) {
