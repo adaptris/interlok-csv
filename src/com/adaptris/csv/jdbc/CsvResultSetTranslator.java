@@ -60,7 +60,7 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
   public void prepare() throws CoreException {}
 
   @Override
-  public void translate(JdbcResult source, AdaptrisMessage target) throws SQLException, ServiceException {
+  public void translateResult(JdbcResult source, AdaptrisMessage target) throws SQLException, ServiceException {
     boolean first = true;
     Set<Integer> excludedIndexes = new HashSet<>();
     try (CsvListWriter csvWriter = new CsvListWriter(target.getWriter(), getPreferenceBuilder().build())) {
