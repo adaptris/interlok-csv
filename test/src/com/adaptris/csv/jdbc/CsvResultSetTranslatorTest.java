@@ -14,11 +14,13 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceCase;
 import com.adaptris.core.jdbc.JdbcConnection;
+import com.adaptris.core.services.jdbc.ConfiguredSQLStatement;
 import com.adaptris.core.services.jdbc.JdbcDataQueryService;
 import com.adaptris.core.util.JdbcUtil;
 import com.adaptris.util.GuidGenerator;
 import com.adaptris.util.TimeInterval;
 
+@SuppressWarnings("deprecation")
 public class CsvResultSetTranslatorTest extends ServiceCase {
 
   private static final GuidGenerator GUID = new GuidGenerator();
@@ -50,7 +52,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
       ccf.setExcludeColumns(Arrays.asList(new String[] {"some","columns","to","exclude"}));
       rst.setColumnFilter(ccf);
       service.setResultSetTranslator(rst);
-      service.setStatement("SELECT StringColumn1, StringColumn2 FROM tablename WHERE ID = 123");
+      service.setStatementCreator(new ConfiguredSQLStatement("SELECT StringColumn1, StringColumn2 FROM tablename WHERE ID = 123"));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -66,7 +68,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
-    s.setStatement("select * from data");
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(new CsvResultSetTranslator());
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
@@ -74,6 +76,27 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertEquals(11, lines.size());
   }
   
+  public void testResultSetToCSV_WithResultCount() throws Exception {
+    String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
+    populateDB(url, 10);
+    JdbcConnection con = new JdbcConnection();
+    con.setConnectUrl(url);
+    con.setDriverImp("org.apache.derby.jdbc.EmbeddedDriver");
+
+    JdbcDataQueryService s = new JdbcDataQueryService();
+    s.setConnection(con);
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
+    CsvResultSetTranslator t = new CsvResultSetTranslator();
+    t.setResultCountMetadataItem(getName());
+    s.setResultSetTranslator(t);
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    execute(s, msg);
+    assertTrue(msg.containsKey(getName()));
+    assertEquals(10, Integer.parseInt(msg.getMetadataValue(getName())));
+    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    assertEquals(11, lines.size());
+  }
+
   public void testResultSetToCSVWith1Exclusion() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -88,7 +111,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
-    s.setStatement("select * from data");
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
@@ -112,7 +135,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
-    s.setStatement("select * from data");
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
@@ -137,7 +160,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
-    s.setStatement("select * from data");
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
@@ -162,7 +185,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
-    s.setStatement("select * from data");
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     msg.addMetadata("key", "ADAPTER_UNIQUE_ID,MESSAGE_TRANSLATOR_TYPE");
@@ -190,7 +213,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
-    s.setStatement("select * from data");
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     msg.addMetadata("inclusions", "ADAPTER_VERSION");
@@ -217,7 +240,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
-    s.setStatement("select * from data");
+    s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     msg.addMetadata("inclusions", "ADAPTER_VERSION");

@@ -60,8 +60,9 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
   public void prepare() throws CoreException {}
 
   @Override
-  public void translate(JdbcResult source, AdaptrisMessage target) throws SQLException, ServiceException {
+  public long translateResult(JdbcResult source, AdaptrisMessage target) throws SQLException, ServiceException {
     boolean first = true;
+    long resultSetCount = 0;
     Set<Integer> excludedIndexes = new HashSet<>();
     try (CsvListWriter csvWriter = new CsvListWriter(target.getWriter(), getPreferenceBuilder().build())) {
       for (JdbcResultSet r : source.getResultSets()) {
@@ -81,11 +82,13 @@ public class CsvResultSetTranslator extends ResultSetTranslatorImp {
           }
           // Write each row to the msg.
           csvWriter.write(values);
+          resultSetCount++;
         }
       }
     } catch (IOException e) {
       throw new ServiceException(e);
     }
+    return resultSetCount;
   }
 
   private Collection<Integer> createExcludedIndexes(AdaptrisMessage msg, JdbcResultRow row) {
