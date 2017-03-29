@@ -18,8 +18,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
@@ -116,19 +118,23 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
 @XStreamAlias("simple-csv-to-xml-transform")
 @AdapterComponent
 @ComponentProfile(summary = "Easily transform a document from CSV to XML", tag = "service,transform,csv,xml")
+@DisplayOrder(order = {"format", "outputMessageEncoding", "elementNamesFromFirstRecord", "uniqueRecordNames", "stripIllegalXmlChars"})
 public class SimpleCsvToXmlTransformService extends ServiceImp {
 
   private static final String CSV_RECORD_NAME = "record";
   private static final String XML_ROOT_ELEMENT = "csv-xml";
   private static final String CSV_FIELD_NAME = "csv-field";
 
-  private Boolean elementNamesFromFirstRecord;
   @NotNull
   @AutoPopulated
   private FormatBuilder format;
-  @InputFieldDefault(value = "true")
-  private Boolean stripIllegalXmlChars = null;
+  @AdvancedConfig
   private String outputMessageEncoding = null;
+  @InputFieldDefault(value = "true")
+  @AdvancedConfig
+  private Boolean stripIllegalXmlChars = null;
+  @InputFieldDefault(value = "false")
+  private Boolean elementNamesFromFirstRecord;
   @InputFieldDefault(value = "true")
   private Boolean uniqueRecordNames = null;
 
