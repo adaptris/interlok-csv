@@ -20,10 +20,12 @@ import org.w3c.dom.Node;
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.ServiceImp;
+import com.adaptris.core.transform.FfTransformService;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.util.XmlUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -124,8 +126,10 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
   @NotNull
   @AutoPopulated
   private FormatBuilder format;
+  @InputFieldDefault(value = "true")
   private Boolean stripIllegalXmlChars = null;
   private String outputMessageEncoding = null;
+  @InputFieldDefault(value = "true")
   private Boolean uniqueRecordNames = null;
 
   public SimpleCsvToXmlTransformService() {
