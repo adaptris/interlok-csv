@@ -51,7 +51,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
 
   private static final String EXAMPLE_COMMENT_HEADER = "\n<!--"
       + "\nThis is a simple CSV to XML transformation service; based on commons-csv"
-      + "\nThe styles are not configurable, only the standard styles are"
+      + "\nThe styles can be configured but popular defaults are"
       + "\navailable: DEFAULT, RFC4180, MYSQL, EXCEL and TAB_DELIMITED" + "\n"
       + "\nIf you wish to have complex transformation rules then you"
       + "\nshould be looking to use our flat file based transformation engine" + "\ninstead" + "\n-->\n";
