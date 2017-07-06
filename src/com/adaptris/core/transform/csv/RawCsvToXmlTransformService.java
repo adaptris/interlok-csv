@@ -50,7 +50,7 @@ TRAILER,4
   <csv-xml>
    <record>
       <csv-field-1>HEADER<csv-field-1>
-      <csv-field-1>19052017</csv-field-1>
+      <csv-field-2>19052017</csv-field-2>
    </record>
    <record>
       <csv-field-1>PRODUCT-CODE<csv-field-1>
@@ -76,7 +76,7 @@ TRAILER,4
    </record>
    <record>
       <csv-field-1>TRAILER<csv-field-1>
-      <csv-field-1>4</csv-field-1>
+      <csv-field-2>4</csv-field-2>
    </record>
   </csv-xml>
 } </pre>
@@ -87,7 +87,7 @@ TRAILER,4
  * may not be as you expect.
  * </p>
  * 
- * @config simple-csv-to-xml-transform
+ * @config raw-csv-to-xml-transform
  * 
  */
 @XStreamAlias("raw-csv-to-xml-transform")
