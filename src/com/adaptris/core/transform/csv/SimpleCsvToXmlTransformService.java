@@ -1,13 +1,9 @@
 package com.adaptris.core.transform.csv;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-
-import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.csv.CSVFormat;
@@ -15,25 +11,19 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import com.adaptris.annotation.AdapterComponent;
-import com.adaptris.annotation.AdvancedConfig;
-import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.ServiceImp;
 import com.adaptris.core.transform.FfTransformService;
 import com.adaptris.core.util.XmlHelper;
-import com.adaptris.util.XmlUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Simple CSV to XML using {@link CSVParser}
+ * Simple CSV to XML using {@link CSVParser}.
  * 
  * <p>
  * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a> as the parsing engine for a CSV
@@ -119,57 +109,24 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
 @AdapterComponent
 @ComponentProfile(summary = "Easily transform a document from CSV to XML", tag = "service,transform,csv,xml")
 @DisplayOrder(order = {"format", "outputMessageEncoding", "elementNamesFromFirstRecord", "uniqueRecordNames", "stripIllegalXmlChars"})
-public class SimpleCsvToXmlTransformService extends ServiceImp {
+public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
 
-  private static final String CSV_RECORD_NAME = "record";
-  private static final String XML_ROOT_ELEMENT = "csv-xml";
-  private static final String CSV_FIELD_NAME = "csv-field";
-
-  @NotNull
-  @AutoPopulated
-  private FormatBuilder format;
-  @AdvancedConfig
-  private String outputMessageEncoding = null;
-  @InputFieldDefault(value = "true")
-  @AdvancedConfig
-  private Boolean stripIllegalXmlChars = null;
   @InputFieldDefault(value = "false")
   private Boolean elementNamesFromFirstRecord;
   @InputFieldDefault(value = "true")
   private Boolean uniqueRecordNames = null;
 
   public SimpleCsvToXmlTransformService() {
-    this(new BasicFormatBuilder());
+    super();
   }
 
   public SimpleCsvToXmlTransformService(FormatBuilder f) {
+    this();
     setFormat(f);
   }
 
-  @Override
-  protected void initService() throws CoreException {}
 
-  @Override
-  protected void closeService() {
-
-  }
-
-  @Override
-  public void prepare() throws CoreException {}
-
-  @Override
-  public void doService(AdaptrisMessage msg) throws ServiceException {
-    try {
-      Document doc = transform(msg);
-      writeXmlDocument(doc, msg);
-    }
-    catch (Exception e) {
-      rethrowServiceException(e);
-    }
-  }
-
-
-  private Document transform(AdaptrisMessage msg) throws ServiceException {
+  protected Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
     CSVFormat format = getFormat().createFormat();
 
@@ -226,60 +183,6 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
     return getElementNamesFromFirstRecord() != null ? getElementNamesFromFirstRecord().booleanValue() : false;
   }
 
-  public FormatBuilder getFormat() {
-    return format;
-  }
-
-  public void setFormat(FormatBuilder csvFormat) {
-    if (csvFormat == null) {
-      throw new IllegalArgumentException("DocumentFormatBuilder may not be null");
-    }
-    this.format = csvFormat;
-  }
-
-  public Boolean getStripIllegalXmlChars() {
-    return stripIllegalXmlChars;
-  }
-
-  /**
-   * Specify whether or not to strip illegal XML characters from all the data before converting to XML.
-   * <p>
-   * The following regular expression is used to strip out all invalid XML 1.0 characters :
-   * <code>"[^\u0009\r\n\u0020-\uD7FF\uE000-\uFFFD\ud800\udc00-\udbff\udfff]"</code>.
-   * </p>
-   * 
-   * @param s true to enable stripping, default is null (true)
-   */
-  public void setStripIllegalXmlChars(Boolean s) {
-    this.stripIllegalXmlChars = s;
-  }
-
-  boolean stripIllegalXmlChars() {
-    return getStripIllegalXmlChars() != null ? getStripIllegalXmlChars().booleanValue() : true;
-  }
-
-  public String getOutputMessageEncoding() {
-    return outputMessageEncoding;
-  }
-
-  /**
-   * Set the encoding for the resulting XML document.
-   * <p>
-   * If not specified the following rules will be applied:
-   * </p>
-   * <ol>
-   * <li>If the {@link AdaptrisMessage#getCharEncoding()} is non-null then that will be used.</li>
-   * <li>UTF-8</li>
-   * </ol>
-   * <p>
-   * As a result; the character encoding on the message is always set using {@link AdaptrisMessage#setCharEncoding(String)}.
-   * </p>
-   * 
-   * @param encoding the character
-   */
-  public void setOutputMessageEncoding(String encoding) {
-    outputMessageEncoding = encoding;
-  }
 
   private static final List<String> createElementNames(int count) {
     List<String> result = new ArrayList<>();
@@ -305,43 +208,6 @@ public class SimpleCsvToXmlTransformService extends ServiceImp {
       result.add(element);
     }
     return result;
-  }
-
-  private Node createTextNode(Document doc, String value) {
-    String munged = stripIllegalXmlChars() ? XmlHelper.stripIllegalXmlCharacters(value) : value;
-    return doc.createTextNode(munged);
-  }
-
-  private Element addNewElement(Document doc, Element parent, String name) {
-    Element newElement = doc.createElement(name);
-    parent.appendChild(newElement);
-    return newElement;
-  }
-
-  /**
-   * Helper method to write the XML document to the AdaptrisMessage taking into account any encoding requirements.
-   * 
-   * @param doc the XML document
-   * @param msg the AdaptrisMessage
-   * @throws Exception
-   */
-  private void writeXmlDocument(Document doc, AdaptrisMessage msg) throws Exception {
-    try (OutputStream out = msg.getOutputStream()) {
-      String encoding = evaluateEncoding(msg);
-      new XmlUtils().writeDocument(doc, out, encoding);
-      msg.setCharEncoding(encoding);
-    }
-  }
-
-  private String evaluateEncoding(AdaptrisMessage msg) {
-    String encoding = "UTF-8";
-    if (!isEmpty(getOutputMessageEncoding())) {
-      encoding = getOutputMessageEncoding();
-    }
-    else if (!isEmpty(msg.getCharEncoding())) {
-      encoding = msg.getCharEncoding();
-    }
-    return encoding;
   }
 
   private String safeElementName(String input) {
