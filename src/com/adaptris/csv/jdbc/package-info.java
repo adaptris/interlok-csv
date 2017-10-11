@@ -1,5 +1,4 @@
 /**
- * Implementation of {@link com.adaptris.core.services.jdbc.ResultSetTranslator} which writes a the results from a database query as
- * CSV.
+ * Provides CSV support for various JDBC services.
  */
 package com.adaptris.csv.jdbc;
