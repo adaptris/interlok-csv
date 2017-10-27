@@ -26,7 +26,7 @@ public class OrderedCsvMapReader extends CsvMapReader {
   public Map<String, String> read(final String... nameMapping) throws IOException {
     Args.notNull(nameMapping, "mappings");
     if (readRow()) {
-      final Map<String, String> destination = new LinkedHashMap<String, String>();
+      final Map<String, String> destination = new LinkedHashMap<String, String>(nameMapping.length);
       Util.filterListToMap(destination, nameMapping, getColumns());
       return destination;
     }
