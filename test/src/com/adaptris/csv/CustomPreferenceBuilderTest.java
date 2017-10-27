@@ -1,4 +1,4 @@
-package com.adaptris.csv.jdbc;
+package com.adaptris.csv;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,6 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.supercsv.prefs.CsvPreference;
+
+import com.adaptris.csv.CustomPreferenceBuilder;
 
 public class CustomPreferenceBuilderTest {
 

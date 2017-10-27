@@ -28,6 +28,8 @@ import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.JdbcUtil;
 import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**

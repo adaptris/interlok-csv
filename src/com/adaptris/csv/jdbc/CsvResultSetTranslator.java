@@ -20,6 +20,8 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.services.jdbc.ResultSetTranslator;
 import com.adaptris.core.services.jdbc.ResultSetTranslatorImp;
 import com.adaptris.core.util.Args;
+import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.PreferenceBuilder;
 import com.adaptris.jdbc.JdbcResult;
 import com.adaptris.jdbc.JdbcResultRow;
 import com.adaptris.jdbc.JdbcResultSet;
