@@ -12,7 +12,7 @@ import org.supercsv.prefs.CsvPreference;
 @Deprecated
 public class BasicPreferenceBuilder extends com.adaptris.csv.BasicPreferenceBuilder implements PreferenceBuilder {
 
-  private Logger log = LoggerFactory.getLogger(this.getClass());
+  private transient Logger log = LoggerFactory.getLogger(this.getClass());
 
   public BasicPreferenceBuilder() {
     super();
