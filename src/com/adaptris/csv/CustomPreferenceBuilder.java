@@ -48,7 +48,7 @@ public class CustomPreferenceBuilder implements PreferenceBuilder {
   /**
    * Set the quote character for the CSV file.
    * 
-   * @param d the delimiter; if not specified, defaults to {@code "}
+   * @param quoteChar the delimiter; if not specified, defaults to {@code "}
    */
   public void setQuoteChar(Character quoteChar) {
     this.quoteChar = quoteChar;

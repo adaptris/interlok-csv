@@ -102,7 +102,6 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  * </pre>
  * 
  * @config simple-csv-to-xml-transform
- * @license BASIC
  * 
  */
 @XStreamAlias("simple-csv-to-xml-transform")

@@ -1,7 +1,5 @@
 package com.adaptris.core.transform.csv;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-
 import java.io.OutputStream;
 
 import javax.validation.constraints.NotNull;
@@ -14,29 +12,22 @@ import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.ServiceImp;
 import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.XmlHelper;
+import com.adaptris.csv.CsvXmlTransformImpl;
 import com.adaptris.util.XmlUtils;
 
 /**
  * Base class for transforming CSV into XML.
  * 
  */
-public abstract class CsvToXmlServiceImpl extends ServiceImp {
-
-  protected static final String CSV_RECORD_NAME = "record";
-  protected static final String XML_ROOT_ELEMENT = "csv-xml";
-  protected static final String CSV_FIELD_NAME = "csv-field";
+public abstract class CsvToXmlServiceImpl extends CsvXmlTransformImpl {
 
   @NotNull
   @AutoPopulated
   private FormatBuilder format;
-  @AdvancedConfig
-  private String outputMessageEncoding = null;
   @InputFieldDefault(value = "true")
   @AdvancedConfig
   private Boolean stripIllegalXmlChars = null;
@@ -44,17 +35,6 @@ public abstract class CsvToXmlServiceImpl extends ServiceImp {
   public CsvToXmlServiceImpl() {
     setFormat(new BasicFormatBuilder());
   }
-
-  @Override
-  protected void initService() throws CoreException {}
-
-  @Override
-  protected void closeService() {
-
-  }
-
-  @Override
-  public void prepare() throws CoreException {}
 
   @Override
   public void doService(AdaptrisMessage msg) throws ServiceException {
@@ -95,31 +75,8 @@ public abstract class CsvToXmlServiceImpl extends ServiceImp {
     this.stripIllegalXmlChars = s;
   }
 
-  boolean stripIllegalXmlChars() {
+  protected boolean stripIllegalXmlChars() {
     return getStripIllegalXmlChars() != null ? getStripIllegalXmlChars().booleanValue() : true;
-  }
-
-  public String getOutputMessageEncoding() {
-    return outputMessageEncoding;
-  }
-
-  /**
-   * Set the encoding for the resulting XML document.
-   * <p>
-   * If not specified the following rules will be applied:
-   * </p>
-   * <ol>
-   * <li>If the {@link AdaptrisMessage#getCharEncoding()} is non-null then that will be used.</li>
-   * <li>UTF-8</li>
-   * </ol>
-   * <p>
-   * As a result; the character encoding on the message is always set using {@link AdaptrisMessage#setCharEncoding(String)}.
-   * </p>
-   * 
-   * @param encoding the character
-   */
-  public void setOutputMessageEncoding(String encoding) {
-    outputMessageEncoding = encoding;
   }
 
   protected Node createTextNode(Document doc, String value) {
@@ -148,14 +105,4 @@ public abstract class CsvToXmlServiceImpl extends ServiceImp {
     }
   }
 
-  private String evaluateEncoding(AdaptrisMessage msg) {
-    String encoding = "UTF-8";
-    if (!isEmpty(getOutputMessageEncoding())) {
-      encoding = getOutputMessageEncoding();
-    }
-    else if (!isEmpty(msg.getContentEncoding())) {
-      encoding = msg.getContentEncoding();
-    }
-    return encoding;
-  }
 }
