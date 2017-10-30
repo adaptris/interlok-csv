@@ -11,7 +11,7 @@ import org.supercsv.prefs.CsvPreference;
  */
 @Deprecated
 public class CustomPreferenceBuilder extends com.adaptris.csv.CustomPreferenceBuilder implements PreferenceBuilder {
-  private Logger log = LoggerFactory.getLogger(this.getClass());
+  private transient Logger log = LoggerFactory.getLogger(this.getClass());
 
 
   @Override
