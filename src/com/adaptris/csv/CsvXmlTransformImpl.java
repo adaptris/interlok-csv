@@ -1,4 +1,4 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.csv;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 

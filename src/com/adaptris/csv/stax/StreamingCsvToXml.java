@@ -1,5 +1,6 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.csv.stax;
 
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import java.io.BufferedReader;
@@ -13,12 +14,8 @@ import javax.validation.constraints.NotNull;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
@@ -26,19 +23,19 @@ import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
+import com.adaptris.core.transform.csv.SimpleCsvToXmlTransformService;
 import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.CsvXmlTransformImpl;
 import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import net.sf.saxon.s9api.Serializer;
-
 /**
- * Simple CSV to XML using {@link CSVParser}.
+ * CSV to XML using {@code net.sf.supercsv:super-csv} via {@link XMLStreamWriter}
  * 
  * <p>
  * This transformation uses {@code net.sf.supercsv:super-csv} as the parsing engine for a CSV file and uses {@link XMLStreamWriter}
@@ -85,7 +82,7 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
 @XStreamAlias("streaming-csv-to-xml-transform")
 @AdapterComponent
 @ComponentProfile(summary = "Transform CSV to XML using the XML streaming API (STaX).", tag = "service,transform,csv,xml", since = "3.6.6")
-@DisplayOrder(order ={ "preferenceBuilder", "outputMessageEncoding"})
+@DisplayOrder(order = {"preferenceBuilder", "outputMessageEncoding", "streamWriterFactory"})
 public class StreamingCsvToXml extends CsvXmlTransformImpl {
 
   @NotNull
@@ -94,7 +91,10 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
   @InputFieldDefault(value = "csv-basic-preference-builder")
   private PreferenceBuilder preferenceBuilder;
 
-  private transient Logger perfLogger = LoggerFactory.getLogger("com.adaptris.core.transform.csv.PerfLogger");
+  @Valid
+  @AdvancedConfig
+  @InputFieldDefault(value = "csv-default-stream-writer")
+  private StreamWriterFactory streamWriter;
 
   public StreamingCsvToXml() {
     setPreferenceBuilder(new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.STANDARD_PREFERENCE));
@@ -103,8 +103,8 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
   @Override
   public void doService(AdaptrisMessage msg) throws ServiceException {
     log.trace("Beginning doService in {}", LoggingHelper.friendlyName(this));
+    StreamWriterFactory writerFactory = writerFactory();
     XMLStreamWriter xmlWriter = null;
-    Serializer serializer = null;
     int count = 0;
     long start = System.currentTimeMillis();
     try {
@@ -113,11 +113,8 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
       try (Reader reader = new BufferedReader(msg.getReader());
           OrderedCsvMapReader csvReader = new OrderedCsvMapReader(reader, getPreferenceBuilder().build());
           Writer writer = new BufferedWriter(msg.getWriter(encoding))) {
-        // Probalby make this pluggable next, so we can switch to Pretty Saxon if we wanna.
-        // serializer = new Processor(new Configuration()).newSerializer(writer);
-        // serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
-        // xmlWriter = serializer.getXMLStreamWriter();
-        xmlWriter = xmlOutputFactory.createXMLStreamWriter(writer);
+
+        xmlWriter = writerFactory.create(writer);
         log.trace("Using {}", xmlWriter.getClass().getName());
         xmlWriter.writeStartDocument(encoding, "1.0");
         xmlWriter.writeStartElement(XML_ROOT_ELEMENT);
@@ -126,7 +123,7 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
           xmlWriter.writeStartElement(CSV_RECORD_NAME);
           count++;
           for (Map.Entry<String, String> entry : row.entrySet()) {
-            String elementData = XmlHelper.stripIllegalXmlCharacters(StringUtils.defaultIfEmpty(entry.getValue(), ""));
+            String elementData = XmlHelper.stripIllegalXmlCharacters(defaultIfEmpty(entry.getValue(), ""));
             if (!isEmpty(elementData)) {
               xmlWriter.writeStartElement(entry.getKey());
               xmlWriter.writeCharacters(XmlHelper.stripIllegalXmlCharacters(entry.getValue()));
@@ -146,8 +143,7 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
       throw ExceptionHelper.wrapServiceException(e);
     }
     finally {
-      closeQuietly(xmlWriter);
-      closeQuietly(serializer);
+      writerFactory.close(xmlWriter);
     }
     log.trace("Converted {} rows to XML in {}ms", count, System.currentTimeMillis() - start);
   }
@@ -172,31 +168,31 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
     this.preferenceBuilder = Args.notNull(b, "preferenceBuilder");
   }
 
-  private static void closeQuietly(XMLStreamWriter w) {
-    try {
-      if (w != null) {
-        w.close();
-      }
-    }
-    catch (Exception ignore) {
-
-    }
+  /**
+   * @return the streamWriterFactory
+   */
+  public StreamWriterFactory getStreamWriter() {
+    return streamWriter;
   }
 
-  private static void closeQuietly(Serializer w) {
-    try {
-      if (w != null) {
-        w.close();
-      }
-    }
-    catch (Exception ignore) {
-
-    }
+  /**
+   * Set the stream writer factory to use.
+   * 
+   * @param factory the streamWriterFactory to set, default is {@link DefaultWriterFactory} if not specified.
+   */
+  public void setStreamWriter(StreamWriterFactory factory) {
+    this.streamWriter = factory;
   }
+
+  StreamWriterFactory writerFactory() {
+    return getStreamWriter() != null ? getStreamWriter() : new DefaultWriterFactory();
+  }
+
   private static String[] safeElementNames(String[] input) {
     for (int i = 0; i < input.length; i++) {
       input[i] = XmlHelper.safeElementName(input[i], "blank");
     }
     return input;
   }
+
 }

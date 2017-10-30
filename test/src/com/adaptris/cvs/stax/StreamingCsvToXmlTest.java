@@ -1,4 +1,4 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.cvs.stax;
 
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_ILLEGAL;
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_INPUT;
@@ -15,6 +15,7 @@ import com.adaptris.core.transform.TransformServiceExample;
 import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.stax.StreamingCsvToXml;
 import com.adaptris.util.text.xml.XPath;
 
 public class StreamingCsvToXmlTest extends TransformServiceExample {
