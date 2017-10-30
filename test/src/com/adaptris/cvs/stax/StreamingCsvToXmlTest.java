@@ -5,10 +5,16 @@ import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_I
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_INPUT_ILLEGAL_HEADER;
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.LINE_ENDING;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.w3c.dom.Document;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
+import com.adaptris.core.DefaultAdaptrisMessageImp;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.transform.TransformServiceExample;
@@ -17,6 +23,7 @@ import com.adaptris.core.util.XmlHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.stax.SaxonStreamWriterFactory;
 import com.adaptris.csv.stax.StreamingCsvToXml;
+import com.adaptris.util.IdGenerator;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.text.xml.XPath;
 
@@ -34,6 +41,14 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
       + "\nusing XMLStreamWriter."
       + "\nIf you wish to have complex transformation rules then you"
       + "\nshould be looking to use our flat file based transformation engine" + "\ninstead" + "\n-->\n";
+
+  private static enum WhenToBreak {
+    INPUT,
+    OUTPUT,
+    BOTH,
+    NEVER
+  };
+
 
   public StreamingCsvToXmlTest(String name) {
     super(name);
@@ -95,6 +110,27 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  public void testDoService_BrokenInput() throws Exception {
+    AdaptrisMessage msg = new BrokenMessageFactory(WhenToBreak.INPUT).newMessage(CSV_INPUT);
+    StreamingCsvToXml svc = new StreamingCsvToXml();
+    try {
+      execute(svc, msg);
+      fail();
+    } catch (ServiceException expected) {
+
+    }
+  }
+
+  public void testDoService_BrokenOutput() throws Exception {
+    AdaptrisMessage msg = new BrokenMessageFactory(WhenToBreak.OUTPUT).newMessage(CSV_INPUT);
+    StreamingCsvToXml svc = new StreamingCsvToXml();
+    try {
+      execute(svc, msg);
+      fail();
+    } catch (ServiceException expected) {
+
+    }
+  }
 
   public void testDoService_EmptyField() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_EMPTY_FIELD);
@@ -169,4 +205,96 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     return super.getExampleCommentHeader(o) + EXAMPLE_COMMENT_HEADER;
   }
 
+  protected class BrokenMessageFactory extends DefaultMessageFactory {
+
+    private WhenToBreak when;
+
+    public BrokenMessageFactory(WhenToBreak w) {
+      this.when = w;
+    }
+
+    @Override
+    public AdaptrisMessage newMessage() {
+      AdaptrisMessage result = new BrokenMessage(uniqueIdGenerator(), this);
+      return result;
+    }
+
+    boolean brokenInput() {
+      return (when == WhenToBreak.INPUT) || (when == WhenToBreak.BOTH);
+    }
+
+    boolean brokenOutput() {
+      return (when == WhenToBreak.OUTPUT) || (when == WhenToBreak.BOTH);
+    }
+
+  }
+
+
+  public class BrokenMessage extends DefaultAdaptrisMessageImp {
+
+    protected BrokenMessage(IdGenerator guid, AdaptrisMessageFactory amf) throws RuntimeException {
+      super(guid, amf);
+      setPayload(new byte[0]);
+    }
+
+    /**
+     *
+     * @see com.adaptris.core.AdaptrisMessage#getInputStream()
+     */
+    @Override
+    public InputStream getInputStream() throws IOException {
+      if (((BrokenMessageFactory) getFactory()).brokenInput()) {
+        return new ErroringInputStream(super.getInputStream());
+      }
+      return super.getInputStream();
+    }
+
+    /**
+     *
+     * @see com.adaptris.core.AdaptrisMessage#getOutputStream()
+     */
+    @Override
+    public OutputStream getOutputStream() throws IOException {
+      if (((BrokenMessageFactory) getFactory()).brokenOutput()) {
+        return new ErroringOutputStream();
+      }
+      return super.getOutputStream();
+    }
+
+    private class ErroringOutputStream extends OutputStream {
+
+      protected ErroringOutputStream() {
+        super();
+      }
+
+      @Override
+      public void write(int b) throws IOException {
+        throw new IOException("Failed to write");
+      }
+
+    }
+
+    private class ErroringInputStream extends FilterInputStream {
+
+      protected ErroringInputStream(InputStream in) {
+        super(in);
+      }
+
+      @Override
+      public int read() throws IOException {
+        throw new IOException("Failed to read");
+      }
+
+      @Override
+      public int read(byte[] b) throws IOException {
+        throw new IOException("Failed to read");
+      }
+
+      @Override
+      public int read(byte[] b, int off, int len) throws IOException {
+        throw new IOException("Failed to read");
+      }
+
+    }
+  }
 }
