@@ -3,6 +3,7 @@ package com.adaptris.csv.stax;
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 import java.io.Writer;
+import java.util.Arrays;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -45,6 +46,10 @@ public class SaxonStreamWriterFactory extends StreamWriterFactoryImpl {
     setOutputProperties(outputProperties);
   }
 
+  public SaxonStreamWriterFactory(KeyValuePair... outputProperties) {
+    this(new KeyValuePairSet(Arrays.asList(outputProperties)));
+  }
+
   @Override
   public XMLStreamWriter create(Writer w) throws Exception {
     Serializer serializer = configure(new Processor(new Configuration()).newSerializer(w));
@@ -57,6 +62,7 @@ public class SaxonStreamWriterFactory extends StreamWriterFactoryImpl {
   public void close(XMLStreamWriter w) {
     super.close(w);
     closeQuietly(localSerializer.get());
+    localSerializer.set(null);
   }
 
   private static void closeQuietly(Serializer w) {
