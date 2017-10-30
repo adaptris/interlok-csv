@@ -100,6 +100,13 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
     setPreferenceBuilder(new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.STANDARD_PREFERENCE));
   }
 
+  public StreamingCsvToXml(PreferenceBuilder prefs, StreamWriterFactory fact) {
+    this();
+    setPreferenceBuilder(prefs);
+    setStreamWriter(fact);
+  }
+
+
   @Override
   public void doService(AdaptrisMessage msg) throws ServiceException {
     log.trace("Beginning doService in {}", LoggingHelper.friendlyName(this));

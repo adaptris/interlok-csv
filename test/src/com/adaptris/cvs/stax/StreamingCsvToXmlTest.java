@@ -15,8 +15,12 @@ import com.adaptris.core.transform.TransformServiceExample;
 import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.stax.SaxonStreamWriterFactory;
 import com.adaptris.csv.stax.StreamingCsvToXml;
+import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.text.xml.XPath;
+
+import net.sf.saxon.s9api.Serializer;
 
 public class StreamingCsvToXmlTest extends TransformServiceExample {
 
@@ -75,8 +79,22 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/Order_Date"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/Order_Date"));
-    assertEquals("UTF-8", msg.getCharEncoding());
+    assertEquals("UTF-8", msg.getContentEncoding());
   }
+
+  public void testDoService_SaxonWriter() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    StreamingCsvToXml svc = new StreamingCsvToXml(new BasicPreferenceBuilder(),
+        new SaxonStreamWriterFactory(new KeyValuePair(Serializer.Property.INDENT.name(), "yes")));
+    execute(svc, msg);
+    System.err.println(msg.getContent());
+    XPath xpath = new XPath();
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
+    assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/Order_Date"));
+    assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/Order_Date"));
+    assertEquals("UTF-8", msg.getContentEncoding());
+  }
+
 
   public void testDoService_EmptyField() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_EMPTY_FIELD);
@@ -89,7 +107,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     // Should be empty not null.
     assertEquals("", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/Date_Attending"));
     assertEquals("", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/Date_Attending"));
-    assertEquals("UTF-8", msg.getCharEncoding());
+    assertEquals("UTF-8", msg.getContentEncoding());
   }
 
   public void testDoService_IllegalXml() throws Exception {
@@ -100,7 +118,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/Order_Date"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/Order_Date"));
-    assertEquals("UTF-8", msg.getCharEncoding());
+    assertEquals("UTF-8", msg.getContentEncoding());
   }
 
   public void testDoService_MessageIsEncoded() throws Exception {
@@ -109,12 +127,11 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     AdaptrisMessage msg = fact.newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml();
     execute(svc, msg);
-    System.err.println(msg.getContent());
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/Order_Date"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/Order_Date"));
-    assertEquals("ISO-8859-1", msg.getCharEncoding());
+    assertEquals("ISO-8859-1", msg.getContentEncoding());
   }
 
   public void testDoService_OutputEncoding() throws Exception {
@@ -126,7 +143,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/Order_Date"));
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/Order_Date"));
-    assertEquals("ISO-8859-1", msg.getCharEncoding());
+    assertEquals("ISO-8859-1", msg.getContentEncoding());
   }
 
   public void testDoService_InvalidOutputEncoding() throws Exception {
