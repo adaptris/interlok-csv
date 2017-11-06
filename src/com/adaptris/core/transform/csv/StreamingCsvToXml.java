@@ -28,7 +28,6 @@ import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
-import com.adaptris.csv.CsvXmlTransformImpl;
 import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
 import com.adaptris.stax.DefaultWriterFactory;

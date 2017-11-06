@@ -16,7 +16,6 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.XmlHelper;
-import com.adaptris.csv.CsvXmlTransformImpl;
 import com.adaptris.util.XmlUtils;
 
 /**
