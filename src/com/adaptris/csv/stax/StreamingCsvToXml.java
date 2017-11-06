@@ -32,6 +32,8 @@ import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.CsvXmlTransformImpl;
 import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
+import com.adaptris.stax.DefaultWriterFactory;
+import com.adaptris.stax.StreamWriterFactory;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -39,8 +41,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * 
  * <p>
  * This transformation uses {@code net.sf.supercsv:super-csv} as the parsing engine for a CSV file and uses {@link XMLStreamWriter}
- * to write each row as part of an XML document. It may have better performance characteristics with large CSV files compared to
- * {@link SimpleCsvToXmlTransformService}. It also reduces the number of configuration options that are available.
+ * via {@code com.adaptris:interlok-stax} to write each row as part of an XML document. It may have better performance
+ * characteristics with large CSV files compared to {@link SimpleCsvToXmlTransformService}. It also reduces the number of
+ * configuration options that are available.
  * <p>
  * Element names are always generated from the first line; so a header line is always assumed; Note that if your header rows
  * contains characters that would not be allowed in an standard XML element name then it will be replaced with an '_', so "Order
