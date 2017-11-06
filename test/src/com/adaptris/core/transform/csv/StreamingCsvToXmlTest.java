@@ -1,4 +1,4 @@
-package com.adaptris.cvs.stax;
+package com.adaptris.core.transform.csv;
 
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_ILLEGAL;
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_INPUT;
@@ -18,11 +18,11 @@ import com.adaptris.core.DefaultAdaptrisMessageImp;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.transform.TransformServiceExample;
+import com.adaptris.core.transform.csv.StreamingCsvToXml;
 import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
-import com.adaptris.csv.stax.SaxonStreamWriterFactory;
-import com.adaptris.csv.stax.StreamingCsvToXml;
+import com.adaptris.stax.SaxonStreamWriterFactory;
 import com.adaptris.util.IdGenerator;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.text.xml.XPath;
