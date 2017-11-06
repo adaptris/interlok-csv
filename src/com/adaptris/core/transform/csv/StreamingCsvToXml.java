@@ -94,7 +94,7 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
 
   @Valid
   @AdvancedConfig
-  @InputFieldDefault(value = "csv-default-stream-writer")
+  @InputFieldDefault(value = "stax-default-stream-writer")
   private StreamWriterFactory streamWriter;
 
   public StreamingCsvToXml() {
