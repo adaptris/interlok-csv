@@ -1,8 +1,10 @@
 package com.adaptris.csv;
 
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import com.adaptris.annotation.AdvancedConfig;
+import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceImp;
@@ -18,6 +20,7 @@ public abstract class CsvXmlTransformImpl extends ServiceImp {
   protected static final String CSV_FIELD_NAME = "csv-field";
 
   @AdvancedConfig
+  @InputFieldHint(expression = true)
   private String outputMessageEncoding = null;
 
   public CsvXmlTransformImpl() {
@@ -60,7 +63,7 @@ public abstract class CsvXmlTransformImpl extends ServiceImp {
   protected String evaluateEncoding(AdaptrisMessage msg) {
     String encoding = "UTF-8";
     if (!isEmpty(getOutputMessageEncoding())) {
-      encoding = getOutputMessageEncoding();
+      encoding = defaultIfEmpty(msg.resolve(getOutputMessageEncoding()), "UTF-8");
     }
     else if (!isEmpty(msg.getContentEncoding())) {
       encoding = msg.getContentEncoding();

@@ -1,4 +1,4 @@
-package com.adaptris.csv.stax;
+package com.adaptris.core.transform.csv;
 
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -23,7 +23,6 @@ import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.transform.csv.SimpleCsvToXmlTransformService;
 import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.LoggingHelper;
