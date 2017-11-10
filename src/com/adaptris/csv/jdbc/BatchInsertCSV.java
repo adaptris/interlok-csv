@@ -29,6 +29,7 @@ import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.JdbcUtil;
 import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -36,8 +37,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * Convenience service for inserting a CSV file into a database.
  * 
  * <p>
- * This creates insert statements based on the CSV file. The actual insert statement will only
- * be generated once based on the first JSON object in the array and executed the appropriate number of times.
+ * This creates insert statements based on the CSV file. The actual insert statement will only be generated once based on the first
+ * CSV line and executed the appropriate number of times.
  * </p>
  * <pre>
  * {@code 
@@ -46,13 +47,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
    bob, smith, 2017-01-01
    carol, smith,2017-01-01
    }
- * </pre>
- * will effectively execute the following statement {@code INSERT INTO table (firstname,lastname,dob) VALUES (?,?,?)} 3 times;
- * batching as required using {@link PreparedStatement#addBatch()} / {@link PreparedStatement#executeBatch()}.
+ * </pre> will effectively execute the following statement {@code INSERT INTO table (firstname,lastname,dob) VALUES (?,?,?)} 3
+ * times; batching as required using {@link PreparedStatement#addBatch()} / {@link PreparedStatement#executeBatch()}.
  * </p>
  * <p>
- * Note that no parsing/assertion of the column names will be done, so if they are invalid SQL columns then it's going to be
- * fail.
+ * Note that no parsing/assertion of the column names will be done, so if they are invalid SQL columns then it's going to be fail.
  * </p>
  * 
  * @config csv-jdbc-batch-insert
@@ -60,7 +59,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @AdapterComponent
-@ComponentProfile(summary = "Insert a CSV file into a database", tag = "service,csv,jdbc")
+@ComponentProfile(summary = "Insert a CSV file into a database", tag = "service,csv,jdbc", since = "3.6.5")
 @XStreamAlias("csv-jdbc-batch-insert")
 @DisplayOrder(order = {"table", "batchWindow"})
 public class BatchInsertCSV extends JdbcMapInsert {
@@ -106,7 +105,8 @@ public class BatchInsertCSV extends JdbcMapInsert {
     Connection conn = null;
     PreparedStatement stmt = null;
     log.trace("Beginning doService in {}", LoggingHelper.friendlyName(this));
-    try (Reader reader = msg.getReader(); CsvMapReader csvReader = new CsvMapReader(reader, getPreferenceBuilder().build())) {
+    try (Reader reader = msg.getReader();
+        CsvMapReader csvReader = new OrderedCsvMapReader(reader, getPreferenceBuilder().build())) {
 
       conn = getConnection(msg);
       String[] hdrs = csvReader.getHeader(true);

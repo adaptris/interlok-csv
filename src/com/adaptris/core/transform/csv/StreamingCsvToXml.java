@@ -146,6 +146,7 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
         xmlWriter.writeEndElement();
         xmlWriter.writeEndDocument();
       }
+      msg.setContentEncoding(encoding);
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapServiceException(e);

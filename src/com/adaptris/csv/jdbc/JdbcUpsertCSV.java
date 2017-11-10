@@ -20,6 +20,7 @@ import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.JdbcUtil;
 import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -44,7 +45,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @AdapterComponent
-@ComponentProfile(summary = "Insert/Update a CSV file into a database", tag = "service,csv,jdbc")
+@ComponentProfile(summary = "Insert/Update a CSV file into a database", tag = "service,csv,jdbc", since = "3.6.5")
 @XStreamAlias("csv-jdbc-upsert")
 @DisplayOrder(order = {"table", "idField"})
 public class JdbcUpsertCSV extends JdbcMapUpsert {
@@ -76,7 +77,8 @@ public class JdbcUpsertCSV extends JdbcMapUpsert {
   public void doService(AdaptrisMessage msg) throws ServiceException {
     Connection conn = null;
     log.trace("Beginning doService in {}", LoggingHelper.friendlyName(this));
-    try (Reader reader = msg.getReader(); CsvMapReader csvReader = new CsvMapReader(reader, getPreferenceBuilder().build())) {
+    try (Reader reader = msg.getReader();
+        CsvMapReader csvReader = new OrderedCsvMapReader(reader, getPreferenceBuilder().build())) {
       conn = getConnection(msg);
       String[] hdrs = csvReader.getHeader(true);
       InsertWrapper wrapper = null;
