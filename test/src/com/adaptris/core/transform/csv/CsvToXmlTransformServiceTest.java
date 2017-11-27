@@ -13,38 +13,38 @@ import com.adaptris.util.text.xml.XPath;
 
 public class CsvToXmlTransformServiceTest extends TransformServiceExample {
 
-  private static final String LINE_ENDING = System.getProperty("line.separator");
-  private static final String ILLEGAL_XML_CHAR = new String(new byte[]
+  public static final String LINE_ENDING = System.getProperty("line.separator");
+  public static final String ILLEGAL_XML_CHAR = new String(new byte[]
   {
     (byte) 0x02
   });
 
-  private static final String CSV_INPUT_ILLEGAL_HEADER = "Name?,Order Date#,Date Attending,Total Paid" + ILLEGAL_XML_CHAR
+  public static final String CSV_INPUT_ILLEGAL_HEADER = "Name?,Order Date#,Date Attending,Total Paid" + ILLEGAL_XML_CHAR
       + LINE_ENDING + "Record1,\"Sep 15, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record2,\"Sep 16, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record3,\"Sep 17, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING;
 
-  private static final String CSV_INPUT = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
+  public static final String CSV_INPUT = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
       + "Record1,\"Sep 15, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record2,\"Sep 16, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record3,\"Sep 17, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING;
 
-  private static final String CSV_ILLEGAL = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
+  public static final String CSV_ILLEGAL = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
       + "Record1,\"Sep 15, 2012\",\"Oct 22, 2012 at 6:00 PM\"," + ILLEGAL_XML_CHAR + "" + LINE_ENDING
       + "Record2,\"Sep 16, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record3,\"Sep 17, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING;
 
-  private static final String CSV_TAB = "Name\tOrder Date\tDate Attending\tTotal Paid" + LINE_ENDING
+  public static final String CSV_TAB = "Name\tOrder Date\tDate Attending\tTotal Paid" + LINE_ENDING
       + "Record1\t\"Sep 15, 2012\"\t\"Oct 22, 2012 at 6:00 PM\"\t0" + LINE_ENDING
       + "Record2\t\"Sep 16, 2012\"\t\"Oct 22, 2012 at 6:00 PM\"\t0" + LINE_ENDING
       + "Record3\t\"Sep 17, 2012\"\t\"Oct 22, 2012 at 6:00 PM\"\t0" + LINE_ENDING;
 
-  private static final String CSV_MYSQL = "Name\tOrder Date\tDate Attending\tTotal Paid\n"
+  public static final String CSV_MYSQL = "Name\tOrder Date\tDate Attending\tTotal Paid\n"
       + "Record1\t\"Sep 15, 2012\"\t\"Oct 22, 2012 at 6:00 PM\"\t0\n"
       + "Record2\t\"Sep 16, 2012\"\t\"Oct 22, 2012 at 6:00 PM\"\t0\n"
       + "Record3\t\"Sep 17, 2012\"\t\"Oct 22, 2012 at 6:00 PM\"\t0\n";
 
-  private static final String CSV_BLANK_HDR = "Name,,Date Attending,Total Paid" + LINE_ENDING
+  public static final String CSV_BLANK_HDR = "Name,,Date Attending,Total Paid" + LINE_ENDING
       + "Record1,\"Sep 15, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record2,\"Sep 16, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
       + "Record3,\"Sep 17, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING;
