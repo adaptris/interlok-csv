@@ -48,9 +48,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 Event Name,Order Date,Ticket Type,Date Attending,Total Paid
 Glastonbury,"Sep 15, 2012",Free entry,"Jun 26, 2014 at 6:00 PM",0
 Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
- * </code>
- * </pre>
- * Then the output (without a header row) would be
+ * </code> </pre> Then the output (without a header row, and with unique-record-names=true) would be
  * 
  * <pre>
  * <code>
@@ -76,10 +74,9 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  *     &lt;csv-field-4>Aug 30, 2014 at 6:00 PM&lt;/csv-field-4>
  *     &lt;csv-field-5>0&lt;/csv-field-5>
  *   &lt;/record-3>
- * </code>
- * </pre>
+ * </code> </pre>
  * 
- * And with a header row specified :
+ * And with a header row specified (and unique-record-names = true):
  * 
  * <pre>
  * <code>
@@ -98,8 +95,7 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  *     &lt;Date_Attending>Aug 30, 2014 at 6:00 PM&lt;/Date_Attending>
  *     &lt;Total_Paid>0&lt;/Total_Paid>
  *   &lt;/record-2>
- * </code>
- * </pre>
+ * </code> </pre>
  * 
  * @config simple-csv-to-xml-transform
  * 
@@ -112,7 +108,7 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
 
   @InputFieldDefault(value = "false")
   private Boolean elementNamesFromFirstRecord;
-  @InputFieldDefault(value = "true")
+  @InputFieldDefault(value = "false")
   private Boolean uniqueRecordNames = null;
 
   public SimpleCsvToXmlTransformService() {
@@ -225,13 +221,13 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
    * and so on. If false, then they are all called <code>record</code>
    * </p>
    * 
-   * @param b true to generate a unique element name for each line in the CSV, default null (true)
+   * @param b true to generate a unique element name for each line in the CSV, default null (false)
    */
   public void setUniqueRecordNames(Boolean b) {
     this.uniqueRecordNames = b;
   }
 
   boolean uniqueRecords() {
-    return getUniqueRecordNames() != null ? getUniqueRecordNames() : true;
+    return getUniqueRecordNames() != null ? getUniqueRecordNames() : false;
   }
 }
