@@ -23,8 +23,8 @@
   <publications>
      <artifact name="adp-simple-csv" type="jar" ext="jar"  conf="*"/>
      <artifact name="adp-simple-csv" type="pom" ext="pom" conf="*"/>
-     <artifact name="adp-simple-csv-javadoc" type="javadoc" ext="zip" conf="javadoc"/>
-     <artifact name="adp-simple-csv-examples" type="examples" ext="zip" conf="examples"/>
+
+
      <artifact type="javadoc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
      <artifact type="examples" ext="jar" conf="examples" m:classifier="examples"/>
   </publications>
