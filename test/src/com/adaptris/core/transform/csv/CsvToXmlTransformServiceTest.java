@@ -115,6 +115,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setStripIllegalXmlChars(true);
+    svc.setUniqueRecordNames(true);
     svc.setElementNamesFromFirstRecord(true);
     execute(svc, msg);
     XPath xpath = new XPath();
@@ -125,6 +126,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_DefaultStyle() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -137,7 +139,6 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_NonUniqueRecords() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
-    svc.setUniqueRecordNames(false);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -151,6 +152,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.RFC4180));
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -164,6 +166,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.EXCEL));
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -177,6 +180,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_TAB);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.TAB_DELIMITED));
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -190,6 +194,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_MYSQL);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setFormat(new BasicFormatBuilder(BasicFormatBuilder.Style.MYSQL));
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -207,6 +212,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     builder.setIgnoreEmptyLines(true);
     // Should now be the same as "DEFAULT"
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService(builder);
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -220,6 +226,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setElementNamesFromFirstRecord(true);
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -231,6 +238,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_BLANK_HDR);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setElementNamesFromFirstRecord(true);
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -243,6 +251,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     fact.setDefaultCharEncoding("ISO-8859-1");
     AdaptrisMessage msg = fact.newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -257,6 +266,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     svc.setOutputMessageEncoding("ISO-8859-1");
     svc.setStripIllegalXmlChars(false);
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -308,6 +318,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     }
     msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_ILLEGAL);
     svc.setStripIllegalXmlChars(true);
+    svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
