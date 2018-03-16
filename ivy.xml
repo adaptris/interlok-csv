@@ -33,7 +33,7 @@
     <dependency org="com.adaptris" name="interlok-common" rev="${adp-core-version}" conf="compile->default;javadoc->javadoc" changing="true"/>
     <dependency org="com.adaptris" name="interlok-stax" rev="${adp-core-version}" conf="compile->default;javadoc->javadoc" changing="true"/>
     <dependency org="com.adaptris" name="adp-stubs" rev="${adp-core-version}" changing="true" conf="test->default"/>
-    <dependency org="org.apache.commons" name="commons-csv" rev="1.1" conf="compile->default"/>
+    <dependency org="org.apache.commons" name="commons-csv" rev="1.5" conf="compile->default"/>
     <dependency org="net.sf.supercsv" name="super-csv" rev="2.4.0" conf="compile->default"/>
     <dependency org="com.adaptris" name="adp-core-apt" rev="${adp-core-version}" conf="compile->default;ant->default" changing="true"/>
 
