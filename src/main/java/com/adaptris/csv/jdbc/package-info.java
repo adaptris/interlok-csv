@@ -1,7 +1,8 @@
 /**
  * Provides CSV support for various JDBC services.
  * 
- * <br/>
+ * <p>
  * <img alt="UML" src="package.svg"/>
+ * </p>
  */
 package com.adaptris.csv.jdbc;

@@ -1,7 +1,8 @@
 /**
  * Custom splitter implementations
  * 
- * <br/>
+ * <p>
  * <img alt="UML" src="package.svg"/>
+ * </p>
  */
 package com.adaptris.csv.splitter;
