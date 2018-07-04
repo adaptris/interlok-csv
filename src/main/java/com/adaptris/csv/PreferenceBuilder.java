@@ -1,12 +1,18 @@
 package com.adaptris.csv;
 
+import org.supercsv.prefs.CsvPreference;
+
 /**
  * Builder for creating the required format for building the CSV file.
  * 
  * @author lchan
  * 
  */
-@SuppressWarnings("deprecation")
-public interface PreferenceBuilder extends com.adaptris.csv.jdbc.PreferenceBuilder {
-
+public interface PreferenceBuilder {
+  /**
+   * Create the CSVFormat.
+   * 
+   * @return the CSV Format.
+   */
+  CsvPreference build();
 }
