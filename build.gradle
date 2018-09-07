@@ -82,7 +82,7 @@ dependencies {
   annotationProcessor ("com.adaptris:interlok-common:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:1.0.18")
 
-  testCompile ("org.junit.jupiter:junit-jupiter-api:5.2.0")
+  testCompile ("org.junit.jupiter:junit-jupiter-api:5.3.0")
   testCompile ("org.junit.vintage:junit-vintage-engine:5.3.0")
   testCompile ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true}
   testCompile ("org.apache.derby:derby:10.14.2.0")
