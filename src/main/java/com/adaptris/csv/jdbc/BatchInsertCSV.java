@@ -113,7 +113,7 @@ public class BatchInsertCSV extends JdbcMapInsert {
       InsertWrapper wrapper = null;
       for (Map<String, String> row; (row = csvReader.read(hdrs)) != null;) {
         if (wrapper == null) {
-          wrapper = new InsertWrapper(row);
+          wrapper = new InsertWrapper(table(msg), row);
           log.trace("Generated [{}]", wrapper.statement());
           stmt = prepareStatement(conn, wrapper.statement());
         }
