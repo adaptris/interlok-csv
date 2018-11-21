@@ -1,5 +1,15 @@
 package com.adaptris.csv.splitter;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang.StringUtils;
+import org.supercsv.prefs.CsvPreference;
+
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
@@ -12,14 +22,6 @@ import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.apache.commons.lang.StringUtils;
-import org.supercsv.prefs.CsvPreference;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author mwarman
@@ -60,6 +62,7 @@ public class CsvMetadataSplitter extends MessageSplitterImp {
     private boolean firstLineCheck = true;
     private String[] headers;
     private AdaptrisMessage nextMessage;
+    private boolean iteratorInvoked = false;
 
     private CsvSplitGenerator(AdaptrisMessage adaptrisMessage, CsvPreference preferences) throws IOException {
       super(adaptrisMessage.getReader(), preferences);
@@ -103,6 +106,10 @@ public class CsvMetadataSplitter extends MessageSplitterImp {
 
     @Override
     public Iterator<AdaptrisMessage> iterator() {
+      if (iteratorInvoked) {
+        throw new IllegalStateException("iterator already invoked");
+      }
+      iteratorInvoked = true;
       return this;
     }
   }

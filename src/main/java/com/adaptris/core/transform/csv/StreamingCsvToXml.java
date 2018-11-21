@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.adaptris.annotation.AdapterComponent;
@@ -117,7 +116,6 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
     long start = System.currentTimeMillis();
     try {
       String encoding = evaluateEncoding(msg);
-      XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
       try (Reader reader = new BufferedReader(msg.getReader());
           OrderedCsvMapReader csvReader = new OrderedCsvMapReader(reader, getPreferenceBuilder().build());
           Writer writer = new BufferedWriter(msg.getWriter(encoding))) {
