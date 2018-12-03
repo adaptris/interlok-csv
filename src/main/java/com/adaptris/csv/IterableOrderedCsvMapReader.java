@@ -1,18 +1,20 @@
 package com.adaptris.csv;
 
-import com.adaptris.core.util.Args;
-import com.adaptris.core.util.CloseableIterable;
-import org.supercsv.prefs.CsvPreference;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.supercsv.prefs.CsvPreference;
+
+import com.adaptris.core.util.Args;
+import com.adaptris.core.util.CloseableIterable;
+
 /**
  * @author mwarman
  */
 public class IterableOrderedCsvMapReader extends OrderedCsvMapReader implements CloseableIterable<Map<String, String>>, Iterator<Map<String, String>> {
+  private boolean iteratorInvoked = false;
 
   private boolean firstLineCheck = true;
   private String[] headers;
@@ -24,6 +26,10 @@ public class IterableOrderedCsvMapReader extends OrderedCsvMapReader implements 
 
   @Override
   public Iterator<Map<String, String>> iterator() {
+    if (iteratorInvoked) {
+      throw new IllegalStateException("iterator already invoked");
+    }
+    iteratorInvoked = true;
     return this;
   }
 

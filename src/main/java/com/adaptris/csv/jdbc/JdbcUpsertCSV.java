@@ -83,7 +83,7 @@ public class JdbcUpsertCSV extends JdbcMapUpsert {
       String[] hdrs = csvReader.getHeader(true);
       InsertWrapper wrapper = null;
       for (Map<String, String> row; (row = csvReader.read(hdrs)) != null;) {
-        handleUpsert(conn, row);
+        handleUpsert(table(msg), conn, row);
       }
       commit(conn, msg);
     } catch (Exception e) {
