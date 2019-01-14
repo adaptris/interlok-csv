@@ -3,6 +3,7 @@ package com.adaptris.core.transform.csv;
 import java.lang.reflect.Method;
 
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,47 +68,47 @@ public class CustomFormatBuilder implements FormatBuilder {
   private enum FormatOptions {
     COMMENT_MARKER {
       @Override
-      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, COMMENT_MARKER_METHODS, Character.class, this, config.getCommentStart());
-      }      
+      public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
+        return configureCSV(current, COMMENT_MARKER_METHODS, Character.class, this.name(), config.getCommentStart());
+      }
     },
     ESCAPE_CHARACTER {
       @Override
-      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, ESCAPE_CHAR_METHODS, Character.class, this, config.getEscape());
+      public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
+        return configureCSV(current, ESCAPE_CHAR_METHODS, Character.class, this.name(), config.getEscape());
       }
     },
     QUOTE_CHARACTER {
       @Override
-      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, QUOTE_CHAR_METHODS, Character.class, this, config.getQuoteChar());
+      public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
+        return configureCSV(current, QUOTE_CHAR_METHODS, Character.class, this.name(), config.getQuoteChar());
       }
 
     },
     IGNORE_EMPTY_LINES {
       @Override
-      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, IGNORE_EMPTY_LINES_METHODS, boolean.class, this, config.ignoreEmptyLines());
+      public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
+        return configureCSV(current, IGNORE_EMPTY_LINES_METHODS, boolean.class, this.name(), config.ignoreEmptyLines());
       }
 
     },
     IGNORE_SURROUNDING_SPACES {
       @Override
-      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, IGNORE_SURROUNDING_LINES_METHODS, boolean.class, this, config.ignoreSurroundingSpaces());
+      public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
+        return configureCSV(current, IGNORE_SURROUNDING_LINES_METHODS, boolean.class, this.name(), config.ignoreSurroundingSpaces());
       }
 
     },
     RECORD_SEPARATOR {
       @Override
-      CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, RECORD_SEPARATOR_METHODS, String.class, this, config.recordSeparator());
+      public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
+        return configureCSV(current, RECORD_SEPARATOR_METHODS, String.class, this.name(), config.recordSeparator());
       }
 
     };
-    abstract CSVFormat create(CustomFormatBuilder config, CSVFormat current);
+    public abstract CSVFormat create(CustomFormatBuilder config, CSVFormat current);
   };
-  
+
   @Override
   public CSVFormat createFormat() {
     CSVFormat format = CSVFormat.newFormat(delimiter().charValue());
@@ -173,7 +174,7 @@ public class CustomFormatBuilder implements FormatBuilder {
   }
 
   boolean ignoreEmptyLines() {
-    return getIgnoreEmptyLines() != null ? getIgnoreEmptyLines().booleanValue() : false;
+    return BooleanUtils.toBooleanDefaultIfNull(getIgnoreEmptyLines(), false);
   }
 
   public Boolean getIgnoreSurroundingSpaces() {
@@ -190,7 +191,7 @@ public class CustomFormatBuilder implements FormatBuilder {
   }
 
   boolean ignoreSurroundingSpaces() {
-    return getIgnoreSurroundingSpaces() != null ? getIgnoreSurroundingSpaces().booleanValue() : false;
+    return BooleanUtils.toBooleanDefaultIfNull(getIgnoreSurroundingSpaces(), false);
   }
 
   public String getRecordSeparator() {
@@ -210,17 +211,14 @@ public class CustomFormatBuilder implements FormatBuilder {
     return getRecordSeparator() != null ? getRecordSeparator() : DEFAULT_RECORD_SEPARATOR;
   }
 
-  private static CSVFormat configureCSV(CSVFormat obj, String[] candidates, Class type, FormatOptions option, Object value) {
+  protected static CSVFormat configureCSV(CSVFormat obj, String[] candidates, Class type, String optionName, Object value) {
     CSVFormat result = obj;
-    Method m = findMethod(CSVFormat.class, candidates, type);
-    if (m == null) {
-      throw new UnsupportedOperationException("Cannot find appropriate method to handle " + option.name());
-    }
     try {
+      Method m = findMethod(CSVFormat.class, candidates, type);
       result = (CSVFormat) m.invoke(obj, value);
     }
     catch (Exception e) {
-      throw new UnsupportedOperationException("Cannot find appropriate method to handle " + option.name());
+      throw new UnsupportedOperationException("Cannot find appropriate method to handle " + optionName);
     }
     return result;
   }

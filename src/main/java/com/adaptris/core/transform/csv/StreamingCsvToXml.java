@@ -60,14 +60,14 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  * <pre>
  * <code>
  * &lt;csv-xml>
- *   &lt;record>
+ *   &lt;record line="1">
  *     &lt;Event_Name>Glastonbury&lt;/Event_Name>
  *     &lt;Order_Date>Sep 15, 2012&lt;/Order_Date>
  *     &lt;Ticket_Type>Free entry&lt;/Ticket_Type>
  *     &lt;Date_Attending>Jun 26, 2014 at 6:00 PM&lt;/Date_Attending>
  *     &lt;Total_Paid>0&lt;/Total_Paid>
  *   &lt;/record>
- *   &lt;record>
+ *   &lt;record line="2">
  *     &lt;Event_Name>Reading Festival&lt;/Event_Name>
  *     &lt;Order_Date>Sep 16, 2012&lt;/Order_Date>
  *     &lt;Ticket_Type>Free entry&lt;/Ticket_Type>
@@ -128,6 +128,9 @@ public class StreamingCsvToXml extends CsvXmlTransformImpl {
         for (Map<String, String> row; (row = csvReader.read(hdrs)) != null;) {
           xmlWriter.writeStartElement(CSV_RECORD_NAME);
           count++;
+          if (includeLineNumberAttribute()) {
+            xmlWriter.writeAttribute("line", String.valueOf(count));
+          }
           for (Map.Entry<String, String> entry : row.entrySet()) {
             String elementData = XmlHelper.stripIllegalXmlCharacters(defaultIfEmpty(entry.getValue(), ""));
             if (!isEmpty(elementData)) {

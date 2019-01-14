@@ -48,9 +48,22 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("19052017", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/csv-field-2"));
     assertEquals("GSL", xpath.selectSingleTextItem(doc, "/csv-xml/record[3]/csv-field-9"));
     assertEquals("YYYYYYYY", xpath.selectSingleTextItem(doc, "/csv-xml/record[4]/csv-field-1"));
-    assertEquals("UTF-8", msg.getCharEncoding());
+    assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  public void testDoService_IncludeLineNumberAttribute() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
+    svc.setIncludeLineNumberAttribute(true);
+    execute(svc, msg);
+    XPath xpath = new XPath();
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
+    assertEquals("19052017", xpath.selectSingleTextItem(doc, "/csv-xml/record[@line='1']/csv-field-2"));
+    assertEquals("GSL", xpath.selectSingleTextItem(doc, "/csv-xml/record[@line='3']/csv-field-9"));
+    assertEquals("YYYYYYYY", xpath.selectSingleTextItem(doc, "/csv-xml/record[@line='4']/csv-field-1"));
+    assertEquals("UTF-8", msg.getContentEncoding());
+  }
+  
   public void testDoService_Exception() throws Exception {
     AdaptrisMessage msg = new DefectiveMessageFactory().newMessage(CSV_INPUT);
     RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
