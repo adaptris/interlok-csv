@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.csv.CSVFormat;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.core.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -129,10 +130,7 @@ public class BasicFormatBuilder implements FormatBuilder {
   }
 
   public void setStyle(Style csvFormat) {
-    if (csvFormat == null) {
-      throw new IllegalArgumentException("Style may not be null");
-    }
-    this.style = csvFormat;
+    this.style = Args.notNull(csvFormat, "style");
   }
 
   @Override

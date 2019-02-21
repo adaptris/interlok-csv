@@ -115,13 +115,18 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
       CSVParser parser = format.parse(in);
       Element root = doc.createElement(XML_ROOT_ELEMENT);
       doc.appendChild(root);
+      int recordCount = 1;      
       for (CSVRecord record : parser) {
         Element recordElement = addNewElement(doc, root, CSV_RECORD_NAME);
+        if (includeLineNumberAttribute()) {
+          recordElement.setAttribute("line", String.valueOf(recordCount));
+        }
         // Create the sub doc here.
         List<Element> csvFields = createFields(doc, record);
         for (Element field : csvFields) {
           recordElement.appendChild(field);
         }
+        recordCount++;        
       }
     }
     catch (Exception e) {

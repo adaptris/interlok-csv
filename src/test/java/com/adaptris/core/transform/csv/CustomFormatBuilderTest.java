@@ -116,4 +116,16 @@ public class CustomFormatBuilderTest {
     assertNotNull(builder.createFormat());
   }
 
+  @Test(expected=UnsupportedOperationException.class)
+  public void testConfigureCSV() throws Exception {
+    CSVFormat format = CSVFormat.newFormat(',');
+    assertNotNull(CustomFormatBuilder.configureCSV(format, new String[]
+    {
+        "withCommentMarker", "withCommentStart"
+    }, Character.class, "commentMarker", '#'));
+    CustomFormatBuilder.configureCSV(format, new String[] {
+        "hello",
+        "world"
+    }, Character.class, "dummyValue", '#');
+  }
 }

@@ -3,7 +3,10 @@ package com.adaptris.core.transform.csv;
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import com.adaptris.annotation.AdvancedConfig;
+import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
@@ -22,7 +25,9 @@ public abstract class CsvXmlTransformImpl extends ServiceImp {
   @AdvancedConfig
   @InputFieldHint(expression = true)
   private String outputMessageEncoding = null;
-
+  @InputFieldDefault(value = "false")
+  private Boolean includeLineNumberAttribute = null;
+  
   public CsvXmlTransformImpl() {
   }
 
@@ -69,5 +74,24 @@ public abstract class CsvXmlTransformImpl extends ServiceImp {
       encoding = msg.getContentEncoding();
     }
     return encoding;
+  }
+  
+
+  public Boolean getIncludeLineNumberAttribute() {
+    return includeLineNumberAttribute;
+  }
+
+  /**
+   * Specify whether or not to include the line number as an attribute on each record.
+   * 
+   * 
+   * @param b whether to include the line number attribute default null (false)
+   */
+  public void setIncludeLineNumberAttribute(Boolean b) {
+    this.includeLineNumberAttribute = b;
+  }
+  
+  protected boolean includeLineNumberAttribute() {
+    return BooleanUtils.toBooleanDefaultIfNull(getIncludeLineNumberAttribute(), false);
   }
 }

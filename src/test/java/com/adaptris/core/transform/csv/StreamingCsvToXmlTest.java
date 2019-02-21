@@ -96,7 +96,19 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[2]/Order_Date"));
     assertEquals("UTF-8", msg.getContentEncoding());
   }
-
+  
+  public void testDoService_IncludeLineNumberAttribute() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    StreamingCsvToXml svc = new StreamingCsvToXml();
+    svc.setIncludeLineNumberAttribute(true);
+    execute(svc, msg);
+    XPath xpath = new XPath();
+    Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
+    assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[@line='1']/Order_Date"));
+    assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[@line='2']/Order_Date"));
+    assertEquals("UTF-8", msg.getContentEncoding());
+  }
+  
   public void testDoService_SaxonWriter() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml(new BasicPreferenceBuilder(),

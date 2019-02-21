@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.BooleanUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -147,6 +148,9 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
         }
         String recordName = CSV_RECORD_NAME + ((uniqueRecords()) ? "-" + recordCount : "");
         Element recordElement = addNewElement(doc, root, recordName);
+        if (includeLineNumberAttribute()) {
+          recordElement.setAttribute("line", String.valueOf(recordCount));
+        }
         // Create the sub doc here.
         List<Element> csvFields = createFields(doc, record, elemNames);
         for (Element field : csvFields) {
@@ -175,7 +179,7 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
   }
 
   boolean elemNamesFirstRec() {
-    return getElementNamesFromFirstRecord() != null ? getElementNamesFromFirstRecord().booleanValue() : false;
+    return BooleanUtils.toBooleanDefaultIfNull(getElementNamesFromFirstRecord(), false);
   }
 
 
@@ -218,7 +222,7 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
    * 
    * <p>
    * If there are multiple records in then each record can have a unique element name; e.g <code>record-1, record-2, record-3</code>
-   * and so on. If false, then they are all called <code>record</code>
+   * and so on. If false, then they are all called <code>record</code> with an associated attribute that declares the line number.
    * </p>
    * 
    * @param b true to generate a unique element name for each line in the CSV, default null (false)
@@ -228,6 +232,7 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
   }
 
   boolean uniqueRecords() {
-    return getUniqueRecordNames() != null ? getUniqueRecordNames() : false;
+    return BooleanUtils.toBooleanDefaultIfNull(getUniqueRecordNames(), false);
   }
+
 }
