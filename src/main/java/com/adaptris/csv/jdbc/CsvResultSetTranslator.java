@@ -14,6 +14,8 @@ import org.apache.commons.lang.StringUtils;
 import org.supercsv.io.CsvListWriter;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
@@ -30,9 +32,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 /**
  * Implementation of {@link ResultSetTranslator} that outputs each row as a part of a CSV.
  * 
- *
+ * @config jdbc-csv-output
  */
 @XStreamAlias("jdbc-csv-output")
+@ComponentProfile(summary = "Output each row in the result set as a line in a CSV", since = "3.8.0")
+@DisplayOrder(order = {"preferenceBuilder", "columnNameStyle", "columnTranslators", "columnFilter"})
 public class CsvResultSetTranslator extends ResultSetTranslatorImp {
   protected static final String ELEMENT_NAME_COLUMN = "column-";
 
