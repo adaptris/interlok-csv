@@ -19,7 +19,6 @@ import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.transform.FfTransformService;
 import com.adaptris.core.util.XmlHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -32,7 +31,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * {@link BasicFormatBuilder.Style#EXCEL EXCEL}, {@link BasicFormatBuilder.Style#RFC4180 RFC4180},
  * {@link BasicFormatBuilder.Style#MYSQL MYSQL} and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to
  * the base formats defined by {@link CSVFormat}. Custom CSV formats are provided via {@link CustomFormatBuilder}. In the event that
- * you have more complex requirements then you should be looking to use the {@link FfTransformService} instead.
+ * you have more complex requirements then you should be looking to use the {@code FlatFileTransformService} instead.
  * </p>
  * <p>
  * If {@link #setElementNamesFromFirstRecord(Boolean)} is true, then the first record is used to generate the element names;
