@@ -76,6 +76,7 @@ public class JdbcUpsertCSV extends JdbcMapUpsert {
   @Override
   public void doService(AdaptrisMessage msg) throws ServiceException {
     Connection conn = null;
+    int rowsAffected = 0;
     log.trace("Beginning doService in {}", LoggingHelper.friendlyName(this));
     try (Reader reader = msg.getReader();
         CsvMapReader csvReader = new OrderedCsvMapReader(reader, getPreferenceBuilder().build())) {
@@ -83,11 +84,12 @@ public class JdbcUpsertCSV extends JdbcMapUpsert {
       String[] hdrs = csvReader.getHeader(true);
       InsertWrapper wrapper = null;
       for (Map<String, String> row; (row = csvReader.read(hdrs)) != null;) {
-        handleUpsert(table(msg), conn, row);
+        rowsAffected += handleUpsert(table(msg), conn, row);
       }
-      commit(conn, msg);
+      addUpdatedMetadata(rowsAffected, msg);
+      JdbcUtil.commit(conn, msg);
     } catch (Exception e) {
-      rollback(conn, msg);
+      JdbcUtil.rollback(conn, msg);
       throw ExceptionHelper.wrapServiceException(e);
     } finally {
       JdbcUtil.closeQuietly(conn);
