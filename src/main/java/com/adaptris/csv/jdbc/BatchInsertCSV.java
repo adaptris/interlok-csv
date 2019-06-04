@@ -31,6 +31,7 @@ import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
+import com.adaptris.util.NumberUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -104,6 +105,7 @@ public class BatchInsertCSV extends JdbcMapInsert {
   public void doService(AdaptrisMessage msg) throws ServiceException {
     Connection conn = null;
     PreparedStatement stmt = null;
+    int rowsAffected = 0;
     log.trace("Beginning doService in {}", LoggingHelper.friendlyName(this));
     try (Reader reader = msg.getReader();
         CsvMapReader csvReader = new OrderedCsvMapReader(reader, getPreferenceBuilder().build())) {
@@ -118,12 +120,13 @@ public class BatchInsertCSV extends JdbcMapInsert {
           stmt = prepareStatement(conn, wrapper.statement());
         }
         wrapper.addParams(stmt, row);
-        execute(stmt);                
+        rowsAffected += execute(stmt);
       }
-      finish(stmt);
-      commit(conn, msg);
+      rowsAffected += finish(stmt);
+      addUpdatedMetadata(rowsAffected, msg);
+      JdbcUtil.commit(conn, msg);
     } catch (Exception e) {
-      rollback(conn, msg);
+      JdbcUtil.rollback(conn, msg);
       throw ExceptionHelper.wrapServiceException(e);
     } finally {
       JdbcUtil.closeQuietly(conn);
@@ -132,28 +135,41 @@ public class BatchInsertCSV extends JdbcMapInsert {
   }
 
 
-  private void execute(PreparedStatement insert) throws SQLException {
+  private int execute(PreparedStatement insert) throws SQLException {
     int count = counter.get().incrementAndGet();
     insert.addBatch();
     if (count % batchWindow() == 0) {
       log.trace("BatchWindow reached, executeBatch()");
-      executeBatch(insert);
+      return executeBatch(insert);
     }
+    return 0;
   }
 
-  private void finish(PreparedStatement insert) throws SQLException {
-    executeBatch(insert);
+  private int finish(PreparedStatement insert) throws SQLException {
+    int rowsAffected = executeBatch(insert);
     counter.set(new AtomicInteger());
+    return rowsAffected;
   }
 
-  private void executeBatch(PreparedStatement insert) throws SQLException {
+  private int executeBatch(PreparedStatement insert) throws SQLException {
     int[] rc = insert.executeBatch();
+    return accumulate(rc);
+  }
+
+  protected static int accumulate(int[] rc) throws SQLException {
+    int rowsAffected = 0;
     List<Integer> result = Arrays.asList(ArrayUtils.toObject(rc));
     if (result.contains(Statement.EXECUTE_FAILED)) {
       throw new SQLException("Batch Execution Failed.");
     }
+    for (int i : rc) {
+      // Not Statement.EXECUTE_FAILED or SUCCESS_NO_INFO
+      if (i >= 0) {
+        rowsAffected += i;
+      }
+    }
+    return rowsAffected;
   }
-
   /**
    * @return the batchWindow
    */
@@ -171,7 +187,7 @@ public class BatchInsertCSV extends JdbcMapInsert {
   }
 
   int batchWindow() {
-    return getBatchWindow() != null ? getBatchWindow().intValue() : DEFAULT_BATCH_WINDOW;
+    return NumberUtils.toIntDefaultIfNull(getBatchWindow(), DEFAULT_BATCH_WINDOW);
   }
 
 }

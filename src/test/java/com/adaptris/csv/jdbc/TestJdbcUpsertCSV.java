@@ -24,10 +24,11 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
 
   public void testService_Insert() throws Exception {
     createDatabase();
-    JdbcUpsertCSV service = configureForTests(createService());
-    service.setIdField(ID_ELEMENT_VALUE);
+    JdbcUpsertCSV service = configureForTests(createService()).withId(ID_ELEMENT_VALUE).withRowsAffectedMetadataKey("rowsAffected");
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_CONTENT);
     execute(service, msg);
+    assertTrue(msg.headersContainsKey("rowsAffected"));
+    assertEquals("3", msg.getMetadataValue("rowsAffected"));
     doAssert(3);
   }
 
@@ -61,6 +62,7 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
     return configureForExamples(createService()).withId("id").withTable("myTable");
   }
 
+  @Override
   protected JdbcUpsertCSV createService() {
     return new JdbcUpsertCSV();
   }
