@@ -11,9 +11,12 @@ import org.apache.commons.lang.StringUtils;
 import org.supercsv.prefs.CsvPreference;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
+import com.adaptris.core.services.splitter.MessageSplitter;
 import com.adaptris.core.services.splitter.MessageSplitterImp;
 import com.adaptris.core.util.Args;
 import com.adaptris.core.util.CloseableIterable;
@@ -24,9 +27,15 @@ import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
+ * {@link MessageSplitter} implementation that splits a CSV file line by line adding all CSV columns as metadata in the split
+ * message.
+ * 
  * @author mwarman
+ * @config csv-metadata-splitter
  */
 @XStreamAlias("csv-metadata-splitter")
+@ComponentProfile(summary = "Split a CSV file line by line, immediately adding as metadata", since = "3.8.2")
+@DisplayOrder(order = {"copyMetadata", "copyMetadata", "preferenceBuilder"})
 public class CsvMetadataSplitter extends MessageSplitterImp {
 
   @NotNull

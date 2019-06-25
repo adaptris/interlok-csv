@@ -10,12 +10,21 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang.StringUtils;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+/**
+ * {@link ColumnFilter} implementation that allows you to filter columns based on metadata.
+ * 
+ * @config csv-metadata-column-filter
+ */
 @XStreamAlias("csv-metadata-column-filter")
+@ComponentProfile(summary = "Filter CSV column output based on metadata keys", since = "3.8.0")
+@DisplayOrder(order = {"inclusionKeys", "exclusionsKeys"})
 public class MetadataColumnFilter implements ColumnFilter {
 
   @XStreamImplicit(itemFieldName = "exclusion-key")

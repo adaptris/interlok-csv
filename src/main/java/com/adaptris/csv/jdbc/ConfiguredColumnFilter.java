@@ -8,12 +8,21 @@ import java.util.TreeSet;
 import javax.validation.constraints.NotNull;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+/**
+ * {@link ColumnFilter} implementation that allows you to filter columns based on configuration.
+ * 
+ * @config csv-configured-column-filter
+ */
 @XStreamAlias("csv-configured-column-filter")
+@ComponentProfile(summary = "Filter CSV column output based on configuration", since = "3.8.0")
+@DisplayOrder(order = {"includeColumns", "excludeColumns"})
 public class ConfiguredColumnFilter implements ColumnFilter {
 
   @XStreamImplicit(itemFieldName = "exclude-column")
