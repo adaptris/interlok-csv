@@ -2,6 +2,7 @@ package com.adaptris.csv;
 
 import java.util.Collection;
 import javax.validation.Valid;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.supercsv.io.CsvListWriter;
 import com.adaptris.annotation.ComponentProfile;
@@ -39,7 +40,7 @@ public class CsvBlobListRenderer implements BlobListRenderer {
           csvWriter.writeHeader("bucket", "name", "size", "lastModified");
           first = false;
         }
-        csvWriter.write(blob.getBucket(), blob.getName(), blob.getSize(), blob.getLastModified());
+        csvWriter.write(StringUtils.defaultIfBlank(blob.getBucket(), ""), blob.getName(), blob.getSize(), blob.getLastModified());
       }
     } catch (Exception e) {
       throw ExceptionHelper.wrapCoreException(e);
