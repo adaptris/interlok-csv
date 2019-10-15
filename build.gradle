@@ -19,7 +19,7 @@ ext {
 
   interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
   interlokCommonJavadocs= project.hasProperty('interlokCommonJavadocs') ? project.getProperty('interlokCommonJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
-  interlokStaxJavadocs= project.hasProperty('interlokStaxJavadocs') ? project.getProperty('interlokStaxJavadocs') : javadocsBaseUrl + "/interlok-stax/" + interlokCoreVersion
+  // interlokStaxJavadocs= project.hasProperty('interlokStaxJavadocs') ? project.getProperty('interlokStaxJavadocs') : javadocsBaseUrl + "/interlok-stax/" + interlokCoreVersion
 
   componentName='Interlok/CSV'
   organizationName = "Adaptris Ltd"
@@ -100,7 +100,7 @@ dependencies {
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
-  offlineJavadocPackages ("com.adaptris:interlok-stax:$interlokCoreVersion:javadoc@jar") { changing= true}
+  // offlineJavadocPackages ("com.adaptris:interlok-stax:$interlokCoreVersion:javadoc@jar") { changing= true}
 
 }
 
@@ -158,7 +158,7 @@ javadoc {
   configure(options) {
     options.linksOffline(interlokJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-core-$interlokCoreVersion-javadoc.jar")
     options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
-    options.linksOffline(interlokStaxJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-stax-$interlokCoreVersion-javadoc.jar")
+    // options.linksOffline(interlokStaxJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-stax-$interlokCoreVersion-javadoc.jar")
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
     options.group("Base CSV preferences", ["com.adaptris.csv.*", "com.adaptris.csv"]).
@@ -214,7 +214,7 @@ task umlJavadoc(type: Javadoc) {
   configure(options) {
     options.linksOffline(interlokJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-core-$interlokCoreVersion-javadoc.jar")
     options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
-    options.linksOffline(interlokStaxJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-stax-$interlokCoreVersion-javadoc.jar")
+    // options.linksOffline(interlokStaxJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-stax-$interlokCoreVersion-javadoc.jar")
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
     options.docletpath = configurations.umlDoclet.files.asType(List)
