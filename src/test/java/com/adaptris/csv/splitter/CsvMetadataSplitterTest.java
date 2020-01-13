@@ -1,25 +1,25 @@
 package com.adaptris.csv.splitter;
-
+import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.LINE_ENDING;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import java.util.List;
+import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.csv.CsvCaseUtils;
-import junit.framework.TestCase;
-
-import java.util.List;
-
-import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.LINE_ENDING;
 
 /**
  * @author mwarman
  */
-public class CsvMetadataSplitterTest extends TestCase {
+public class CsvMetadataSplitterTest {
 
   private static final String CSV_INPUT_FIELD = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
       + "Record1,\"Sep 15, 2012\",,0" + LINE_ENDING
       + "Record2,\"Sep 16, 2012\",,0" + LINE_ENDING
       + "Record3,\"Sep 17, 2012\",,0" + LINE_ENDING;
 
+  @Test
   public void testSplitMessage() throws Exception{
     CsvMetadataSplitter splitter = new CsvMetadataSplitter();
     AdaptrisMessage adaptrisMessage = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_FIELD);

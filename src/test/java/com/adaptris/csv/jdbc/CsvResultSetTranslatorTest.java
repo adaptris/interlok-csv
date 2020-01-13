@@ -27,6 +27,10 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
   private static final GuidGenerator GUID = new GuidGenerator();
 
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
+  }
 
   @Override
   protected Object retrieveObjectForSampleConfig() {
