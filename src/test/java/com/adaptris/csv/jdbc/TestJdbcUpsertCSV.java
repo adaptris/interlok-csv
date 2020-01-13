@@ -1,9 +1,12 @@
 package com.adaptris.csv.jdbc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
+import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
@@ -18,10 +21,7 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
   protected static final String CAROL = "carol";
   protected static final String DOB = "2017-01-03";
 
-  public TestJdbcUpsertCSV(String arg0) {
-    super(arg0);
-  }
-
+  @Test
   public void testService_Insert() throws Exception {
     createDatabase();
     JdbcUpsertCSV service = configureForTests(createService()).withId(ID_ELEMENT_VALUE).withRowsAffectedMetadataKey("rowsAffected");
@@ -32,6 +32,7 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
     doAssert(3);
   }
 
+  @Test
   public void testService_Insert_InvalidColumn() throws Exception {
     createDatabase();
     JdbcUpsertCSV service = configureForTests(createService());
@@ -46,6 +47,7 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
     }
   }
 
+  @Test
   public void testService_Update() throws Exception {
     createDatabase();
     populateDatabase();

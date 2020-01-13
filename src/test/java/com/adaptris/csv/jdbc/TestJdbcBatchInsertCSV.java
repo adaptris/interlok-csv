@@ -1,8 +1,11 @@
 package com.adaptris.csv.jdbc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
@@ -11,10 +14,7 @@ import com.adaptris.core.services.jdbc.JdbcMapInsert;
 public class TestJdbcBatchInsertCSV extends JdbcCSVInsertCase {
 
 
-  public TestJdbcBatchInsertCSV(String arg0) {
-    super(arg0);
-  }
-
+  @Test
   public void testAccumulate() throws Exception {
     int[] rc = {1, 2, Statement.EXECUTE_FAILED};
     try {
@@ -26,6 +26,7 @@ public class TestJdbcBatchInsertCSV extends JdbcCSVInsertCase {
     assertEquals(3, BatchInsertCSV.accumulate(rc2));
   }
 
+  @Test
   public void testService() throws Exception {
     createDatabase();
     BatchInsertCSV service = configureForTests(createService()).withRowsAffectedMetadataKey("rowsAffected");
@@ -37,6 +38,7 @@ public class TestJdbcBatchInsertCSV extends JdbcCSVInsertCase {
   }
 
 
+  @Test
   public void testService_InvalidColumns() throws Exception {
     createDatabase();
     BatchInsertCSV service = configureForTests(createService());
@@ -54,6 +56,7 @@ public class TestJdbcBatchInsertCSV extends JdbcCSVInsertCase {
     return configureForExamples(createService()).withTable("myTable");
   }
 
+  @Test
   public void testService_LowBatchWindow() throws Exception {
     createDatabase();
     BatchInsertCSV service = configureForTests(createService());

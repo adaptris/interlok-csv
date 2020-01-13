@@ -1,5 +1,8 @@
 package com.adaptris.csv.jdbc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -7,9 +10,8 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.commons.io.IOUtils;
-
+import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceCase;
@@ -24,19 +26,6 @@ import com.adaptris.util.TimeInterval;
 public class CsvResultSetTranslatorTest extends ServiceCase {
 
   private static final GuidGenerator GUID = new GuidGenerator();
-
-  public CsvResultSetTranslatorTest(String name) {
-    super(name);
-  }
-
-
-  public void setUp() throws Exception {
-    super.setUp();
-  }
-
-  public void tearDown() throws Exception {
-    super.tearDown();
-  }
 
 
   @Override
@@ -59,6 +48,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     return service;
   }
 
+  @Test
   public void testResultSetToCSV() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -76,6 +66,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertEquals(11, lines.size());
   }
   
+  @Test
   public void testResultSetToCSV_WithResultCount() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -97,6 +88,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertEquals(11, lines.size());
   }
 
+  @Test
   public void testResultSetToCSVWith1Exclusion() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -121,6 +113,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertEquals(2, lines.get(1).split(",").length);
   }
 
+  @Test
   public void testResultSetToCSVWithInclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -146,6 +139,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
   }
 
   
+  @Test
   public void testResultSetToCSVWith2Exclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -171,6 +165,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertEquals(1, lines.get(1).split(",").length);
   }
   
+  @Test
   public void testResultSetToCSVWithMetadataExclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -198,6 +193,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
   }
 
 
+  @Test
   public void testResultSetToCSVWithMetadataInclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
@@ -225,6 +221,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     assertEquals(1, lines.get(1).split(",").length);
   }
 
+  @Test
   public void testResultSetToCSVWithMetadataInclusionsAndExclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
     populateDB(url, 10);
