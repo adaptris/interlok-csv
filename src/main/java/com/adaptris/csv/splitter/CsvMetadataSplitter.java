@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.supercsv.prefs.CsvPreference;
 
 import com.adaptris.annotation.AutoPopulated;

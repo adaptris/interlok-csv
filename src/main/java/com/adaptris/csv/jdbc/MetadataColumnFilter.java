@@ -7,7 +7,7 @@ import java.util.TreeSet;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;

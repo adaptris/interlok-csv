@@ -2,7 +2,7 @@ package com.adaptris.csv;
 
 import java.util.Collection;
 import javax.validation.Valid;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.supercsv.io.CsvListWriter;
 import com.adaptris.annotation.ComponentProfile;

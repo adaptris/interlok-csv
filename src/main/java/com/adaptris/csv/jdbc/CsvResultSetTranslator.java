@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.supercsv.io.CsvListWriter;
 
 import com.adaptris.annotation.AutoPopulated;
