@@ -1,7 +1,7 @@
 package com.adaptris.core.transform.csv;
 
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.apache.commons.lang3.BooleanUtils;
 

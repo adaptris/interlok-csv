@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.supercsv.io.CsvMapReader;
 
 import com.adaptris.annotation.AdapterComponent;
