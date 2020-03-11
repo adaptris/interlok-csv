@@ -4,21 +4,22 @@ import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_I
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_INPUT;
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.CSV_INPUT_ILLEGAL_HEADER;
 import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.LINE_ENDING;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import org.junit.Test;
 import org.w3c.dom.Document;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultAdaptrisMessageImp;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.transform.TransformServiceExample;
-import com.adaptris.core.transform.csv.StreamingCsvToXml;
 import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
@@ -26,7 +27,6 @@ import com.adaptris.stax.SaxonStreamWriterFactory;
 import com.adaptris.util.IdGenerator;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.text.xml.XPath;
-
 import net.sf.saxon.s9api.Serializer;
 
 public class StreamingCsvToXmlTest extends TransformServiceExample {
@@ -49,11 +49,12 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     NEVER
   };
 
-
-  public StreamingCsvToXmlTest(String name) {
-    super(name);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
 
+  @Test
   public void testSetDocumentFormatBuilder() throws Exception {
     StreamingCsvToXml svc = new StreamingCsvToXml();
     assertNotNull(svc.getPreferenceBuilder());
@@ -69,6 +70,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals(BasicPreferenceBuilder.class, svc.getPreferenceBuilder().getClass());
   }
 
+  @Test
   public void testSetOutputEncoding() throws Exception {
     StreamingCsvToXml svc = new StreamingCsvToXml();
     assertNull(svc.getOutputMessageEncoding());
@@ -77,6 +79,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", svc.getOutputMessageEncoding());
   }
 
+  @Test
   public void testDoService_IllegalHeaders() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -86,6 +89,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[1]/Order_Date_"));
   }
 
+  @Test
   public void testDoService_Defaults() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -97,6 +101,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
   
+  @Test
   public void testDoService_IncludeLineNumberAttribute() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -109,6 +114,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
   
+  @Test
   public void testDoService_SaxonWriter() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml(new BasicPreferenceBuilder(),
@@ -122,6 +128,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_BrokenInput() throws Exception {
     AdaptrisMessage msg = new BrokenMessageFactory(WhenToBreak.INPUT).newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -133,6 +140,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     }
   }
 
+  @Test
   public void testDoService_BrokenOutput() throws Exception {
     AdaptrisMessage msg = new BrokenMessageFactory(WhenToBreak.OUTPUT).newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -144,6 +152,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     }
   }
 
+  @Test
   public void testDoService_EmptyField() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_EMPTY_FIELD);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -158,6 +167,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_IllegalXml() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_ILLEGAL);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -169,6 +179,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_MessageIsEncoded() throws Exception {
     DefaultMessageFactory fact = new DefaultMessageFactory();
     fact.setDefaultCharEncoding("ISO-8859-1");
@@ -182,6 +193,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("ISO-8859-1", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_OutputEncoding() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml();
@@ -194,6 +206,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     assertEquals("ISO-8859-1", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_InvalidOutputEncoding() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     StreamingCsvToXml svc = new StreamingCsvToXml();

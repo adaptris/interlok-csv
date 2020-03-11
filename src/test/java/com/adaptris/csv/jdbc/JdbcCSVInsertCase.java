@@ -1,11 +1,13 @@
 package com.adaptris.csv.jdbc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
+import org.junit.Test;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceCase;
 import com.adaptris.core.jdbc.JdbcConnection;
@@ -34,12 +36,7 @@ public abstract class JdbcCSVInsertCase extends ServiceCase {
   protected static final String TABLE_NAME = "people";
 
 
-  public JdbcCSVInsertCase(String arg0) {
-    super(arg0);
-  }
-
-
-
+  @Test
   public void testService_Init() throws Exception {
     JdbcMapInsert service = createService();
     try {

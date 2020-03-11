@@ -1,7 +1,11 @@
 package com.adaptris.core.transform.csv;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import org.junit.Test;
 import org.w3c.dom.Document;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultMessageFactory;
@@ -56,10 +60,12 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
       + "\nIf you wish to have complex transformation rules then you"
       + "\nshould be looking to use our flat file based transformation engine" + "\ninstead" + "\n-->\n";
 
-  public CsvToXmlTransformServiceTest(String name) {
-    super(name);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
 
+  @Test
   public void testSetStripIllegalChars() throws Exception {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     assertNull(svc.getStripIllegalXmlChars());
@@ -74,6 +80,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals(true, svc.stripIllegalXmlChars());
   }
 
+  @Test
   public void testSetDocumentFormatBuilder() throws Exception {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     assertNotNull(svc.getFormat());
@@ -89,6 +96,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals(BasicFormatBuilder.class, svc.getFormat().getClass());
   }
 
+  @Test
   public void testSetElementNamesFromHeader() throws Exception {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     assertNull(svc.getElementNamesFromFirstRecord());
@@ -103,6 +111,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals(false, svc.elemNamesFirstRec());
   }
 
+  @Test
   public void testSetOutputEncoding() throws Exception {
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
     assertNull(svc.getOutputMessageEncoding());
@@ -111,6 +120,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", svc.getOutputMessageEncoding());
   }
 
+  @Test
   public void testDoService_IllegalHeaders() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_ILLEGAL_HEADER);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -123,6 +133,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("Sep 15, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record-1/Order_Date_"));
   }
 
+  @Test
   public void testDoService_DefaultStyle() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -136,6 +147,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_NonUniqueRecords() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -148,6 +160,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
   
+  @Test
   public void testDoService_NonUniqueRecords_IncludeLineNumberAttribute() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -162,6 +175,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
   }
   
 
+  @Test
   public void testDoService_RFC4180() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -176,6 +190,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_Excel() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -190,6 +205,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_TabDelimiter() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_TAB);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -204,6 +220,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_MySql() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_MYSQL);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -217,6 +234,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_CustomStyle() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     CustomFormatBuilder builder = new CustomFormatBuilder();
@@ -236,6 +254,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_HeaderRow() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -248,6 +267,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_HeaderRow_BlankField() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_BLANK_HDR);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -260,6 +280,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_MessageIsEncoded() throws Exception {
     DefaultMessageFactory fact = new DefaultMessageFactory();
     fact.setDefaultCharEncoding("ISO-8859-1");
@@ -275,6 +296,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("ISO-8859-1", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_OutputEncoding() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -290,6 +312,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("ISO-8859-1", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_InvalidOutputEncoding() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -304,6 +327,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     }
   }
 
+  @Test
   public void testDoService_NotCSV() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("<hello>\nabc,def</hello>");
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();
@@ -317,6 +341,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     }
   }
 
+  @Test
   public void testDoService_IllegalXml() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_ILLEGAL);
     SimpleCsvToXmlTransformService svc = new SimpleCsvToXmlTransformService();

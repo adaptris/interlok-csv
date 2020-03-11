@@ -1,7 +1,9 @@
 package com.adaptris.core.transform.csv;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import org.junit.Test;
 import org.w3c.dom.Document;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
@@ -35,10 +37,12 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
       + "\navailable: DEFAULT, RFC4180, MYSQL, EXCEL and TAB_DELIMITED" + "\n"
       + "\n-->\n";
 
-  public RawCsvToXmlTransformServiceTest(String name) {
-    super(name);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
+  
+  @Test
   public void testDoService() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
@@ -51,6 +55,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
+  @Test
   public void testDoService_IncludeLineNumberAttribute() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
@@ -64,6 +69,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
   
+  @Test
   public void testDoService_Exception() throws Exception {
     AdaptrisMessage msg = new DefectiveMessageFactory().newMessage(CSV_INPUT);
     RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
@@ -75,6 +81,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
     }
   }
 
+  @Test
   public void testDoService_NotCsv() throws Exception {
     // This is just a 3 line CSV file... (gasp).
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(NOT_CSV);
