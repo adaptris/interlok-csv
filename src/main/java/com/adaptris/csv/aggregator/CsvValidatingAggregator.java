@@ -1,5 +1,6 @@
 package com.adaptris.csv.aggregator;
 
+import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.annotation.InputFieldHint;
@@ -38,22 +39,25 @@ import org.slf4j.LoggerFactory;
  */
 @XStreamAlias("csv-validating-aggregator")
 @ComponentProfile(summary = "Aggregate messages into a CSV, optionally prefixing a header",
-		since = "3.10.0",
-		tag = "csv,aggregator,validate")
+    since = "3.10.0",
+    tag = "csv,aggregator,validate")
 public class CsvValidatingAggregator extends CsvAggregating
 {
-	public CsvValidatingAggregator withHeader(String s) {
-		header = s;
-		return this;
-	}
+  @InputFieldHint(friendly = "Ensure number of columns in each row match the header")
+  @InputFieldDefault(value = "true")
+  @AdvancedConfig
+  @Getter
+  @Setter
+  private Boolean forceColumns = Boolean.TRUE;
 
-	public void setForceColumns(Boolean forceColumns)
-	{
-		super.forceColumns = forceColumns;
-	}
+  public CsvValidatingAggregator withHeader(String s) {
+    header = s;
+    return this;
+  }
 
-	public Boolean getForceColumns()
-	{
-		return forceColumns();
-	}
+  @Override
+  protected boolean forceColumns()
+  {
+    return ObjectUtils.defaultIfNull(forceColumns, true);
+  }
 }

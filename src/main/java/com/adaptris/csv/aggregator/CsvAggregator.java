@@ -32,13 +32,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Attempts to aggregate messages into a CSV file.
- * 
+ *
  * <p>
  * Note that this is not a validating CSV aggregator since it does not check that the data in the messages to be joined are in fact
  * CSV documents (or in fact match). If the header is defined, then we emit the header, and then we simply append all the documents
  * to be aggregated into the resulting document.
  * </p>
- * 
+ *
  * @author mcwarman
  *
  */
@@ -47,14 +47,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
     tag = "csv,aggregator")
 public class CsvAggregator extends CsvAggregating {
 
-  @Override
-  public void joinMessage(AdaptrisMessage adaptrisMessage, Collection<AdaptrisMessage> collection) throws CoreException {
-    super.forceColumns = false;
-    super.joinMessage(adaptrisMessage, collection);
-  }
-
   public CsvAggregator withHeader(String s) {
     setHeader(s);
     return this;
+  }
+
+  @Override
+  protected boolean forceColumns() {
+    return false;
   }
 }
