@@ -45,35 +45,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("csv-aggregator")
 @ComponentProfile(summary = "Aggregate messages into a CSV, optionally prefixing a header", since = "3.9.3.1",
     tag = "csv,aggregator")
-public class CsvAggregator extends MessageAggregatorImpl {
-
-  @InputFieldHint(expression = true)
-  private String header;
+public class CsvAggregator extends CsvAggregating {
 
   @Override
   public void joinMessage(AdaptrisMessage adaptrisMessage, Collection<AdaptrisMessage> collection) throws CoreException {
-    try (OutputStream outputStream = new BufferedOutputStream(adaptrisMessage.getOutputStream())) {
-      String header = adaptrisMessage.resolve(getHeader());
-      if (!StringUtils.isEmpty(header)) {
-        outputStream.write(header.concat(System.lineSeparator()).getBytes(StandardCharsets.UTF_8));
-      }
-      for (AdaptrisMessage msg : filter(collection)) {
-        try (InputStream in = msg.getInputStream()) {
-          IOUtils.copy(in, outputStream);
-        }
-        overwriteMetadata(msg, adaptrisMessage);
-      }
-    } catch (Exception e) {
-      throw ExceptionHelper.wrapCoreException(e);
-    }
-  }
-
-  public void setHeader(String s) {
-    this.header = s;
-  }
-
-  public String getHeader() {
-    return header;
+    super.forceColumns = false;
+    super.joinMessage(adaptrisMessage, collection);
   }
 
   public CsvAggregator withHeader(String s) {
