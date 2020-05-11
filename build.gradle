@@ -1,11 +1,14 @@
 import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
   id 'java'
   id 'maven'
   id 'maven-publish'
   id  "jacoco"
-  id 'com.github.spotbugs' version '3.0.0'
+  id 'com.github.spotbugs' version '4.0.5'
+  id "io.freefair.lombok" version "5.0.0"
 }
+
 ext {
   interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.10-SNAPSHOT'
   releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.10-SNAPSHOT'
@@ -21,11 +24,13 @@ ext {
   interlokCommonJavadocs= project.hasProperty('interlokCommonJavadocs') ? project.getProperty('interlokCommonJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
   // interlokStaxJavadocs= project.hasProperty('interlokStaxJavadocs') ? project.getProperty('interlokStaxJavadocs') : javadocsBaseUrl + "/interlok-stax/" + interlokCoreVersion
 
+  delombokTargetDir = new File("${project.projectDir}/src/main/generated")
+
   componentName='Interlok/CSV'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  log4j2Version = '2.13.0'
+  log4j2Version = '2.13.2'
   junitJupiterVersion = '5.4.0'
 }
 
@@ -70,6 +75,7 @@ sourceCompatibility = 1.8
 group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
+generateLombokConfig.enabled = false
 
 repositories {
   mavenCentral()
@@ -77,7 +83,6 @@ repositories {
   maven { url "$nexusBaseUrl/content/groups/public" }
   maven { url "$nexusBaseUrl/content/groups/interlok" }
 }
-
 
 configurations {
   javadoc {}
@@ -92,6 +97,11 @@ configurations {
   all*.exclude group: 'net.sf.saxon', module: 'saxon'
   all*.exclude group: 'org.codehaus.woodstox'
   all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
+  // INTERLOK-3197 exclude old javax.mail
+  all*.exclude group: 'com.sun.mail', module: 'javax.mail'
+  all*.exclude group: 'javax.validation', module: 'validation-api'
+  all*.exclude group: 'javax.activation', module: 'activation'
+  all*.exclude group: 'javax.activation', module: 'javax.activation-api'
 }
 
 configurations.all {
@@ -120,9 +130,7 @@ dependencies {
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
   // offlineJavadocPackages ("com.adaptris:interlok-stax:$interlokCoreVersion:javadoc@jar") { changing= true}
-
 }
-
 
 jar {
   manifest {
@@ -134,7 +142,6 @@ jar {
                "Implementation-Vendor": organizationName)
   }
 }
-
 
 sourceSets {
   main {
@@ -197,11 +204,9 @@ jacocoTestReport {
     }
 }
 
-
-task deleteDerbyLog(type: Delete) {
-  delete 'derby.log'
+task deleteGeneratedFiles(type: Delete) {
+  delete 'derby.log', delombokTargetDir
 }
-
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
   classifier = 'javadoc'
@@ -254,7 +259,6 @@ task umlJavadoc(type: Javadoc) {
   }
 }
 
-
 artifacts {
   archives javadocJar
   archives examplesJar
@@ -292,27 +296,39 @@ publishing {
   }
 }
 
-spotbugs {
+delombok {
+  target = delombokTargetDir
+}
+
+task lgtmCompile(type: JavaCompile, dependsOn: delombok) {
+  group 'Build'
+  description 'Compile for lgtm'
+
+  source = sourceSets.main.extensions.delombokTask
+  destinationDir = sourceSets.main.java.outputDir
+  classpath = project.sourceSets.main.compileClasspath
+}
+
+spotbugsMain {
+  effort = "max"
+  reportLevel = "high"
   // showProgress = "true"
   effort = "max"
   // Ignore failures?
   // ignoreFailures = false
-
-  // We only care about "high priority" issues...
-  reportLevel = "high"
+  reports {
+    xml {
+      enabled = false
+    }
+    html {
+      enabled = true
+    }
+  }
 }
 
 // disable spotbugsTests which checks our test code..
 spotbugsTest.enabled = false
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-  reports {
-    xml.enabled = false
-    html.enabled = true
-  }
-}
-
-
 javadoc.dependsOn offlinePackageList,umlJavadoc
-clean.dependsOn deleteDerbyLog
+clean.dependsOn deleteGeneratedFiles
 check.dependsOn jacocoTestReport

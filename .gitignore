@@ -12,6 +12,7 @@ build.properties
 *.iml
 *.iws
 *.class
+.gradle
 
 # Project artefacts from building.
 cobertura.ser
@@ -27,3 +28,5 @@ log4j.properties
 target
 bin
 gradle.properties
+out/
+src/main/generated/

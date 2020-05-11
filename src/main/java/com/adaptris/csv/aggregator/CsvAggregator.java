@@ -32,52 +32,28 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Attempts to aggregate messages into a CSV file.
- * 
+ *
  * <p>
  * Note that this is not a validating CSV aggregator since it does not check that the data in the messages to be joined are in fact
  * CSV documents (or in fact match). If the header is defined, then we emit the header, and then we simply append all the documents
  * to be aggregated into the resulting document.
  * </p>
- * 
+ *
  * @author mcwarman
  *
  */
 @XStreamAlias("csv-aggregator")
 @ComponentProfile(summary = "Aggregate messages into a CSV, optionally prefixing a header", since = "3.9.3.1",
     tag = "csv,aggregator")
-public class CsvAggregator extends MessageAggregatorImpl {
-
-  @InputFieldHint(expression = true)
-  private String header;
-
-  @Override
-  public void joinMessage(AdaptrisMessage adaptrisMessage, Collection<AdaptrisMessage> collection) throws CoreException {
-    try (OutputStream outputStream = new BufferedOutputStream(adaptrisMessage.getOutputStream())) {
-      String header = adaptrisMessage.resolve(getHeader());
-      if (!StringUtils.isEmpty(header)) {
-        outputStream.write(header.concat(System.lineSeparator()).getBytes(StandardCharsets.UTF_8));
-      }
-      for (AdaptrisMessage msg : filter(collection)) {
-        try (InputStream in = msg.getInputStream()) {
-          IOUtils.copy(in, outputStream);
-        }
-        overwriteMetadata(msg, adaptrisMessage);
-      }
-    } catch (Exception e) {
-      throw ExceptionHelper.wrapCoreException(e);
-    }
-  }
-
-  public void setHeader(String s) {
-    this.header = s;
-  }
-
-  public String getHeader() {
-    return header;
-  }
+public class CsvAggregator extends CsvAggregating {
 
   public CsvAggregator withHeader(String s) {
     setHeader(s);
     return this;
+  }
+
+  @Override
+  protected boolean forceColumns() {
+    return false;
   }
 }
