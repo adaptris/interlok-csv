@@ -1,11 +1,10 @@
 package com.adaptris.csv;
 
-import com.adaptris.core.util.CloseableIterable;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import com.adaptris.interlok.util.CloseableIterable;
 
 /**
  * @author mwarman
@@ -19,7 +18,7 @@ public class CsvCaseUtils {
       return (List<E>) iter;
     }
     List<E> result = new ArrayList<E>();
-    try (CloseableIterable<E> messages = ensureCloseable(iter)) {
+    try (CloseableIterable<E> messages = CloseableIterable.ensureCloseable(iter)) {
       for (E msg : messages) {
         result.add(msg);
       }
@@ -28,21 +27,4 @@ public class CsvCaseUtils {
     return result;
   }
 
-  private static <E> CloseableIterable<E> ensureCloseable(final Iterable<E> iter) {
-    if (iter instanceof CloseableIterable) {
-      return (CloseableIterable<E>) iter;
-    }
-
-    return new CloseableIterable<E>() {
-      @Override
-      public void close() throws IOException {
-        // No-op
-      }
-
-      @Override
-      public Iterator<E> iterator() {
-        return iter.iterator();
-      }
-    };
-  }
 }
