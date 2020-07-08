@@ -5,8 +5,9 @@ plugins {
   id 'maven'
   id 'maven-publish'
   id  "jacoco"
-  id 'com.github.spotbugs' version '4.0.5'
-  id "io.freefair.lombok" version "5.0.0"
+  id 'com.github.spotbugs' version '4.2.3'
+  id "io.freefair.lombok" version "5.1.0"
+  id 'org.owasp.dependencycheck' version '5.3.2.1'
 }
 
 ext {
@@ -30,7 +31,6 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  log4j2Version = '2.13.2'
   junitJupiterVersion = '5.4.0'
 }
 
@@ -116,15 +116,18 @@ dependencies {
   compile("org.apache.commons:commons-csv:1.8")
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
 
-  annotationProcessor ("com.adaptris:interlok-common:$interlokCoreVersion") {changing= true}
+  annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:1.1.4")
 
   testCompile ('junit:junit:4.13')
-  testCompile ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true}
+  testCompile "org.slf4j:slf4j-simple:$slf4jVersion"
+  // exclude any log4j dependencies so that we can just use slf4j simple.
+  // works around INTERLOk-3233
+  testCompile "com.adaptris:interlok-stubs:$interlokCoreVersion", {
+    changing= true
+    exclude group: "org.apache.logging.log4j"
+  }
   testCompile ("org.apache.derby:derby:10.14.2.0")
-  testCompile ("org.apache.logging.log4j:log4j-core:$log4j2Version")
-  testCompile ("org.apache.logging.log4j:log4j-1.2-api:$log4j2Version")
-  testCompile ("org.apache.logging.log4j:log4j-api:$log4j2Version")
   testCompile ("org.mockito:mockito-all:1.10.19")
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
@@ -323,6 +326,17 @@ spotbugsMain {
     html {
       enabled = true
     }
+  }
+}
+
+dependencyCheck  {
+  suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
+  skipConfigurations = [ "antSql", "spotbugs", "umlDoclet", "offlineJavadocPackages", "javadoc", "jacocoAnt", "jacocoAgent", "spotbugsPlugins", "spotbugsSlf4j" ]
+  formats = [ "HTML", "JUNIT" ]
+  junitFailOnCVSS = 7.0
+  failBuildOnCVSS = 7.0
+  analyzers {
+    assemblyEnabled=false
   }
 }
 

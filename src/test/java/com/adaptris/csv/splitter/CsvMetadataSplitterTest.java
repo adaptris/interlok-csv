@@ -6,8 +6,8 @@ import java.util.List;
 import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.csv.CsvCaseUtils;
+import com.adaptris.interlok.util.CloseableIterable;
 
 /**
  * @author mwarman
@@ -23,7 +23,7 @@ public class CsvMetadataSplitterTest {
   public void testSplitMessage() throws Exception{
     CsvMetadataSplitter splitter = new CsvMetadataSplitter();
     AdaptrisMessage adaptrisMessage = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT_FIELD);
-    try (CloseableIterable<AdaptrisMessage> iterable = splitter.splitMessage(adaptrisMessage)) {
+    try (CloseableIterable<AdaptrisMessage> iterable = CloseableIterable.ensureCloseable(splitter.splitMessage(adaptrisMessage))) {
       List<AdaptrisMessage> results = CsvCaseUtils.toList(iterable);
       assertEquals(3, results.size());
       assertTrue(results.get(0).headersContainsKey("Name"));

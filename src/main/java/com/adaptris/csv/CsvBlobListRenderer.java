@@ -1,9 +1,8 @@
 package com.adaptris.csv;
 
-import java.util.Collection;
 import javax.validation.Valid;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.supercsv.io.CsvListWriter;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
@@ -13,6 +12,7 @@ import com.adaptris.interlok.InterlokException;
 import com.adaptris.interlok.cloud.BlobListRenderer;
 import com.adaptris.interlok.cloud.RemoteBlob;
 import com.adaptris.interlok.types.InterlokMessage;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -32,9 +32,10 @@ public class CsvBlobListRenderer implements BlobListRenderer {
   }
 
   @Override
-  public void render(Collection<RemoteBlob> list, InterlokMessage msg) throws InterlokException {
+  public void render(Iterable<RemoteBlob> blobs, InterlokMessage msg) throws InterlokException {
     boolean first = true;
-    try (CsvListWriter csvWriter = new CsvListWriter(msg.getWriter(), preferenceBuilder().build())) {
+    try (CloseableIterable<RemoteBlob> list = CloseableIterable.ensureCloseable(blobs);
+        CsvListWriter csvWriter = new CsvListWriter(msg.getWriter(), preferenceBuilder().build())) {
       for (RemoteBlob blob : list) {
         if (first) {
           csvWriter.writeHeader("bucket", "name", "size", "lastModified");
