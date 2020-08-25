@@ -16,7 +16,9 @@ import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
+import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
+import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.core.util.XmlHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -120,6 +122,8 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
   @InputFieldDefault(value = "false")
   private Boolean uniqueRecordNames = null;
 
+  private transient boolean warningLogged;
+
   public SimpleCsvToXmlTransformService() {
     super();
   }
@@ -129,6 +133,13 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
     setFormat(f);
   }
 
+  @Override
+  public void prepare() throws CoreException {
+    LoggingHelper.logDeprecation(warningLogged, () -> warningLogged = true,
+        this.getClass().getCanonicalName(),
+        com.adaptris.csv.transform.CsvToXml.class.getCanonicalName());
+    super.prepare();
+  }
 
   @Override
   protected Document transform(AdaptrisMessage msg) throws ServiceException {

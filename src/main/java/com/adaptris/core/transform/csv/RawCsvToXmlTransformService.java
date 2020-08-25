@@ -14,7 +14,9 @@ import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
+import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
+import com.adaptris.core.util.LoggingHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -101,6 +103,7 @@ TRAILER,4
 @Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
 public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
 
+  private transient boolean warningLogged;
   public RawCsvToXmlTransformService() {
     super();
   }
@@ -110,6 +113,13 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
     setFormat(f);
   }
 
+  @Override
+  public void prepare() throws CoreException {
+    LoggingHelper.logDeprecation(warningLogged, () -> warningLogged = true,
+        this.getClass().getCanonicalName(),
+        com.adaptris.csv.transform.UncheckedCsvToXml.class.getCanonicalName());
+    super.prepare();
+  }
 
   @Override
   protected Document transform(AdaptrisMessage msg) throws ServiceException {
@@ -155,5 +165,6 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
     }
     return result;
   }
+
 
 }
