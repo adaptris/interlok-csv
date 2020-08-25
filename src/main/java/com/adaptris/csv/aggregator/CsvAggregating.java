@@ -1,24 +1,30 @@
 package com.adaptris.csv.aggregator;
 
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.validation.Valid;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.services.aggregator.MessageAggregatorImpl;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.BasicPreferenceBuilder.Style;
+import com.adaptris.csv.OrderedCsvMapReader;
+import com.adaptris.csv.PreferenceBuilder;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.List;
 
 public abstract class CsvAggregating extends MessageAggregatorImpl
 {
@@ -27,68 +33,87 @@ public abstract class CsvAggregating extends MessageAggregatorImpl
   @InputFieldHint(expression = true)
   @Getter
   @Setter
-  protected String header;
-
+  private String header;
   /**
-   * {@inheritDoc}.
+   * How to write the CSV file.
+   *
    */
-  @Override
-  public void joinMessage(AdaptrisMessage message, Collection<AdaptrisMessage> messages) throws CoreException
-  {
-    String header = message.resolve(this.header);
-    // TODO Allow the format to be set from the UI
-    try (CSVPrinter csv = new CSVPrinter(message.getWriter(), CSVFormat.DEFAULT))
-    {
-      int columns = -1;
-      if (!StringUtils.isEmpty(header))
-      {
-        CSVParser parser = CSVParser.parse(header, CSVFormat.DEFAULT);
-        List<CSVRecord> records = parser.getRecords();
-        if (records.size() != 1)
-        {
-          // Maybe throw an exception?
-          log.warn("CSV header has more than 1 row!");
-        }
-        columns = records.get(0).size();
-        csv.printRecords(records);
-      }
+  @Valid
+  @Getter
+  @Setter
+  @InputFieldDefault(value = "csv-basic-preference-builder")
+  private PreferenceBuilder preferenceBuilder;
 
-      for (AdaptrisMessage m : messages)
-      {
-        CSVParser parser = CSVParser.parse(m.getReader(), CSVFormat.DEFAULT);
-        List<CSVRecord> records = parser.getRecords();
-        if (forceColumns())
-        {
-          for (CSVRecord record : records)
-          {
-            if (columns < 0)
-            {
-              // there wasn't a header, so first record sets the number of columns
-              columns = record.size();
-            }
-            if (record.size() == columns)
-            {
-              csv.printRecord(record);
-            }
-            else
-            {
-              // Maybe throw an exception?
-              log.warn("Message {} Row {} has {} columns; expected {}", message.getUniqueId(), record.getRecordNumber(), record.size(), columns);
-            }
+  @Override
+  public void joinMessage(AdaptrisMessage message, Collection<AdaptrisMessage> messages)
+      throws CoreException {
+    String resolvedHeader = message.resolve(getHeader());
+    CsvPreference prefs = buildPreferences();
+
+    try (CsvListWriter csvWriter = new CsvListWriter(message.getWriter(),prefs)) {
+      int columnCount = writeHeaders(csvWriter, resolvedHeader, prefs);
+      for (AdaptrisMessage m : messages) {
+        try (Reader in = m.getReader();
+            OrderedCsvMapReader csvReader = new OrderedCsvMapReader(in, buildPreferences())) {
+          for (List<String> record; (record = csvReader.readNext()) != null;) {
+            assertColumnCount(columnCount, record);
+            csvWriter.write(record);
           }
         }
-        else
-        {
-          csv.printRecords(records);
-        }
       }
-    }
-    catch (Exception e)
-    {
-      log.error("Could not aggregate CSV messages", e);
+    } catch (Exception e) {
       throw ExceptionHelper.wrapCoreException(e);
     }
   }
 
   protected abstract boolean forceColumns();
+
+  private int writeHeaders(CsvListWriter csvWriter, String resolvedHeader, CsvPreference prefs)
+      throws Exception {
+    int columnCount = -1;
+    if (!StringUtils.isEmpty(resolvedHeader)) {
+      List<List<String>> headers = buildHeader(resolvedHeader, prefs);
+      boolean first = true;
+      for (List<String> h : headers) {
+        if (first) {
+          columnCount = h.size();
+          first = false;
+        }
+        assertColumnCount(columnCount, h);
+        csvWriter.write(h);
+      }
+    }
+    return columnCount;
+  }
+
+  private void assertColumnCount(int expected, List columns) throws Exception {
+    if (BooleanUtils.and(new boolean[] {forceColumns(), expected != -1})) {
+      if (columns.size() != expected) {
+        throw new Exception("CSV Column count differs from header column count");
+      }
+    }
+  }
+
+  private CsvPreference buildPreferences() {
+    return ObjectUtils.defaultIfNull(getPreferenceBuilder(),
+        new BasicPreferenceBuilder(Style.STANDARD_PREFERENCE)).build();
+  }
+
+  // Need to include support for "multi-line headers" which is what was supported originally.
+  // I don't understand why?
+  private List<List<String>> buildHeader(String s, CsvPreference prefs) throws Exception {
+    List<List<String>> result = new ArrayList<>();
+    try (StringReader in = new StringReader(s);
+        OrderedCsvMapReader csvReader = new OrderedCsvMapReader(in, prefs);) {
+      for (List<String> record; (record = csvReader.readNext()) != null;) {
+        result.add(new ArrayList<String>(record));
+      }
+    }
+    return result;
+  }
+
+  public <T extends CsvAggregating> T withHeader(String s) {
+    setHeader(s);
+    return (T) this;
+  }
 }
