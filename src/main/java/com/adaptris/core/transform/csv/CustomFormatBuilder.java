@@ -1,24 +1,24 @@
 package com.adaptris.core.transform.csv;
 
 import java.lang.reflect.Method;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.adaptris.annotation.Removal;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Implementation of {@link FormatBuilder} that allows for custom csv formats.
- * 
- * 
- * 
+ *
+ *
+ *
  * @config csv-custom-format
- * @author lchan
- * 
+ * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
  */
+@Deprecated
 @XStreamAlias("csv-custom-format")
+@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
 public class CustomFormatBuilder implements FormatBuilder {
 
   private transient Logger log = LoggerFactory.getLogger(this.getClass());
@@ -32,11 +32,11 @@ public class CustomFormatBuilder implements FormatBuilder {
   private Boolean ignoreEmptyLines;
   private Boolean ignoreSurroundingSpaces;
   private String recordSeparator;
-  
+
   // These are to protect us mostly from API changes in the nightly build
   // We call the appropriate methods reflectively.
   private static final String[] COMMENT_MARKER_METHODS = {
-    "withCommentMarker", 
+    "withCommentMarker",
     "withCommentStart"
   };
 
@@ -69,40 +69,40 @@ public class CustomFormatBuilder implements FormatBuilder {
     COMMENT_MARKER {
       @Override
       public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, COMMENT_MARKER_METHODS, Character.class, this.name(), config.getCommentStart());
+        return configureCSV(current, COMMENT_MARKER_METHODS, Character.class, name(), config.getCommentStart());
       }
     },
     ESCAPE_CHARACTER {
       @Override
       public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, ESCAPE_CHAR_METHODS, Character.class, this.name(), config.getEscape());
+        return configureCSV(current, ESCAPE_CHAR_METHODS, Character.class, name(), config.getEscape());
       }
     },
     QUOTE_CHARACTER {
       @Override
       public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, QUOTE_CHAR_METHODS, Character.class, this.name(), config.getQuoteChar());
+        return configureCSV(current, QUOTE_CHAR_METHODS, Character.class, name(), config.getQuoteChar());
       }
 
     },
     IGNORE_EMPTY_LINES {
       @Override
       public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, IGNORE_EMPTY_LINES_METHODS, boolean.class, this.name(), config.ignoreEmptyLines());
+        return configureCSV(current, IGNORE_EMPTY_LINES_METHODS, boolean.class, name(), config.ignoreEmptyLines());
       }
 
     },
     IGNORE_SURROUNDING_SPACES {
       @Override
       public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, IGNORE_SURROUNDING_LINES_METHODS, boolean.class, this.name(), config.ignoreSurroundingSpaces());
+        return configureCSV(current, IGNORE_SURROUNDING_LINES_METHODS, boolean.class, name(), config.ignoreSurroundingSpaces());
       }
 
     },
     RECORD_SEPARATOR {
       @Override
       public CSVFormat create(CustomFormatBuilder config, CSVFormat current) {
-        return configureCSV(current, RECORD_SEPARATOR_METHODS, String.class, this.name(), config.recordSeparator());
+        return configureCSV(current, RECORD_SEPARATOR_METHODS, String.class, name(), config.recordSeparator());
       }
 
     };
@@ -125,11 +125,11 @@ public class CustomFormatBuilder implements FormatBuilder {
 
   /**
    * Set the delimiter for the CSV file.
-   * 
+   *
    * @param d the delimiter; if not specified, defaults to ","
    */
   public void setDelimiter(Character d) {
-    this.delimiter = d;
+    delimiter = d;
   }
 
   Character delimiter() {
@@ -166,11 +166,11 @@ public class CustomFormatBuilder implements FormatBuilder {
 
   /**
    * Specify whether or not to ignore empty lines.
-   * 
+   *
    * @param b true or false, if not specified false.
    */
   public void setIgnoreEmptyLines(Boolean b) {
-    this.ignoreEmptyLines = b;
+    ignoreEmptyLines = b;
   }
 
   boolean ignoreEmptyLines() {
@@ -183,11 +183,11 @@ public class CustomFormatBuilder implements FormatBuilder {
 
   /**
    * Specify whether or not to ignore surrounding spaces.
-   * 
+   *
    * @param b true or false, if not specified false.
    */
   public void setIgnoreSurroundingSpaces(Boolean b) {
-    this.ignoreSurroundingSpaces = b;
+    ignoreSurroundingSpaces = b;
   }
 
   boolean ignoreSurroundingSpaces() {
@@ -200,11 +200,11 @@ public class CustomFormatBuilder implements FormatBuilder {
 
   /**
    * Set the record separactor
-   * 
+   *
    * @param sep the record separator; if not specified defaults to "\r\n"
    */
   public void setRecordSeparator(String sep) {
-    this.recordSeparator = sep;
+    recordSeparator = sep;
   }
 
   String recordSeparator() {

@@ -3,48 +3,50 @@ package com.adaptris.core.transform.csv;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Raw CSV to XML using {@link CSVParser}.
- * 
+ *
  * <p>
- * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a> as the parsing engine for a CSV
- * file. Basic parsing options are supported : {@link BasicFormatBuilder.Style#DEFAULT DEFAULT},
- * {@link BasicFormatBuilder.Style#EXCEL EXCEL}, {@link BasicFormatBuilder.Style#RFC4180 RFC4180},
- * {@link BasicFormatBuilder.Style#MYSQL MYSQL} and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to
- * the base formats defined by {@link CSVFormat}. Custom CSV formats are provided via {@link CustomFormatBuilder}.
+ * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a>
+ * as the parsing engine for a CSV file. Basic parsing options are supported :
+ * {@link BasicFormatBuilder.Style#DEFAULT DEFAULT}, {@link BasicFormatBuilder.Style#EXCEL EXCEL},
+ * {@link BasicFormatBuilder.Style#RFC4180 RFC4180}, {@link BasicFormatBuilder.Style#MYSQL MYSQL}
+ * and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to the base
+ * formats defined by {@link CSVFormat}. Custom CSV formats are provided via
+ * {@link CustomFormatBuilder}.
  * </p>
  * <p>
- * This service does not attempt to make parsing decisions, so CSV files that have differing number of columns on each line would be
- * perfectly acceptable.
+ * This service does not attempt to make parsing decisions, so CSV files that have differing number
+ * of columns on each line would be perfectly acceptable.
  * </p>
  * <p>
  * For example, given an input document :
- * 
+ *
  * <pre>
- * {@code 
+ * {@code
 HEADER,19052017
 PRODUCT-CODE,BARCODE,DP,PROMPRICE,DISCOUNT,INSTOCK,REPORT,REPORT-DATE,SOURCE
 XXXXXXXX,1234567890123,2.75,0.00,5.00,2,,,GSL
 TRAILER,4
    }
-   </pre> Then the output would be
- * 
+ * </pre>
+ *
+ * Then the output would be
+ *
  * <pre>
  * {@code
   <csv-xml>
@@ -79,21 +81,24 @@ TRAILER,4
       <csv-field-2>4</csv-field-2>
    </record>
   </csv-xml>
-} </pre>
+}
+ * </pre>
  * </p>
  * <p>
- * Because there is no verification that the CSV columns matchup; if the message type isn't a CSV (e.g. it's JSON or XML), then it
- * will still be marked up into XML, so take that into account when using this as part of a workflow. Behaviour with rogue messages
- * may not be as you expect.
+ * Because there is no verification that the CSV columns matchup; if the message type isn't a CSV
+ * (e.g. it's JSON or XML), then it will still be marked up into XML, so take that into account when
+ * using this as part of a workflow. Behaviour with rogue messages may not be as you expect.
  * </p>
- * 
+ *
  * @config raw-csv-to-xml-transform
- * 
+ * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
  */
+@Deprecated
 @XStreamAlias("raw-csv-to-xml-transform")
 @AdapterComponent
 @ComponentProfile(summary = "Easily transform a document from CSV to XML", tag = "service,transform,csv,xml")
 @DisplayOrder(order = {"format", "outputMessageEncoding", "stripIllegalXmlChars"})
+@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
 public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
 
   public RawCsvToXmlTransformService() {
@@ -106,6 +111,7 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
   }
 
 
+  @Override
   protected Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
     CSVFormat format = getFormat().createFormat();
@@ -115,7 +121,7 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
       CSVParser parser = format.parse(in);
       Element root = doc.createElement(XML_ROOT_ELEMENT);
       doc.appendChild(root);
-      int recordCount = 1;      
+      int recordCount = 1;
       for (CSVRecord record : parser) {
         Element recordElement = addNewElement(doc, root, CSV_RECORD_NAME);
         if (includeLineNumberAttribute()) {
@@ -126,7 +132,7 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
         for (Element field : csvFields) {
           recordElement.appendChild(field);
         }
-        recordCount++;        
+        recordCount++;
       }
     }
     catch (Exception e) {

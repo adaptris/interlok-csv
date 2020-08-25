@@ -13,20 +13,21 @@ import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.util.text.xml.XPath;
 
+@SuppressWarnings("deprecation")
 public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
 
   private static final String LINE_ENDING = System.getProperty("line.separator");
 
   private static final String CSV_INPUT =
-        "HEADER,19052017" + LINE_ENDING 
+        "HEADER,19052017" + LINE_ENDING
       + "PRODUCT-CODE,BARCODE,DP,PROMPRICE,DISCOUNT,INSTOCK,REPORT,REPORT-DATE,SOURCE" + LINE_ENDING
       + "XXXXXXXX,1234567890123,2.75,0.00,5.00,2,,,GSL" + LINE_ENDING
       + "YYYYYYYY,1234567890123,20.42,0.00,5.00,0,NYP,24/07/2017,GSL" + LINE_ENDING
       + "AAAAAAAA,1234567890123,2.75,0.00,5.00,88,O/P,13/03/2017,GSL" + LINE_ENDING
-      + "BBBBBBBB,1234567890123,3.60,2.94,5.00,21,,,GSL" + LINE_ENDING 
+      + "BBBBBBBB,1234567890123,3.60,2.94,5.00,21,,,GSL" + LINE_ENDING
       + "TRAILER,4" + LINE_ENDING;
 
-  private static final String NOT_CSV = 
+  private static final String NOT_CSV =
         "<hello>" + LINE_ENDING
       + "abc,def" + LINE_ENDING
       + "</hello>";
@@ -41,7 +42,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
   public boolean isAnnotatedForJunit4() {
     return true;
   }
-  
+
   @Test
   public void testDoService() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
@@ -68,7 +69,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("YYYYYYYY", xpath.selectSingleTextItem(doc, "/csv-xml/record[@line='4']/csv-field-1"));
     assertEquals("UTF-8", msg.getContentEncoding());
   }
-  
+
   @Test
   public void testDoService_Exception() throws Exception {
     AdaptrisMessage msg = new DefectiveMessageFactory().newMessage(CSV_INPUT);

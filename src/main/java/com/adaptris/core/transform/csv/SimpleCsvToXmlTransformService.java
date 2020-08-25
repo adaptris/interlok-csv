@@ -3,20 +3,18 @@ package com.adaptris.core.transform.csv;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.BooleanUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.util.XmlHelper;
@@ -24,32 +22,39 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Simple CSV to XML using {@link CSVParser}.
- * 
+ *
  * <p>
- * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a> as the parsing engine for a CSV
- * file. Basic parsing options are supported : {@link BasicFormatBuilder.Style#DEFAULT DEFAULT},
- * {@link BasicFormatBuilder.Style#EXCEL EXCEL}, {@link BasicFormatBuilder.Style#RFC4180 RFC4180},
- * {@link BasicFormatBuilder.Style#MYSQL MYSQL} and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to
- * the base formats defined by {@link CSVFormat}. Custom CSV formats are provided via {@link CustomFormatBuilder}. In the event that
- * you have more complex requirements then you should be looking to use the {@code FlatFileTransformService} instead.
+ * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a>
+ * as the parsing engine for a CSV file. Basic parsing options are supported :
+ * {@link BasicFormatBuilder.Style#DEFAULT DEFAULT}, {@link BasicFormatBuilder.Style#EXCEL EXCEL},
+ * {@link BasicFormatBuilder.Style#RFC4180 RFC4180}, {@link BasicFormatBuilder.Style#MYSQL MYSQL}
+ * and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to the base
+ * formats defined by {@link CSVFormat}. Custom CSV formats are provided via
+ * {@link CustomFormatBuilder}. In the event that you have more complex requirements then you should
+ * be looking to use the {@code FlatFileTransformService} instead.
  * </p>
  * <p>
- * If {@link #setElementNamesFromFirstRecord(Boolean)} is true, then the first record is used to generate the element names;
- * otherwise names are auto-generated based on the count of fields in the first row. Results are undefined if subsequent record
- * contains more fields than the first record. If the first row contains a blank field then the <code>blank</code> is used as the
- * element name. Note that if your header rows contains characters that would not be allowed in an standard XML element name then it
- * will be replaced with an '_', so "Order Date" becomes "Order_Date".
+ * If {@link #setElementNamesFromFirstRecord(Boolean)} is true, then the first record is used to
+ * generate the element names; otherwise names are auto-generated based on the count of fields in
+ * the first row. Results are undefined if subsequent record contains more fields than the first
+ * record. If the first row contains a blank field then the <code>blank</code> is used as the
+ * element name. Note that if your header rows contains characters that would not be allowed in an
+ * standard XML element name then it will be replaced with an '_', so "Order Date" becomes
+ * "Order_Date".
  * </p>
  * <p>
  * For example, given an input document :
- * 
+ *
  * <pre>
  * <code>
 Event Name,Order Date,Ticket Type,Date Attending,Total Paid
 Glastonbury,"Sep 15, 2012",Free entry,"Jun 26, 2014 at 6:00 PM",0
 Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
- * </code> </pre> Then the output (without a header row, and with unique-record-names=true) would be
- * 
+ * </code>
+ * </pre>
+ *
+ * Then the output (without a header row, and with unique-record-names=true) would be
+ *
  * <pre>
  * <code>
  * &lt;csv-xml>
@@ -74,10 +79,11 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  *     &lt;csv-field-4>Aug 30, 2014 at 6:00 PM&lt;/csv-field-4>
  *     &lt;csv-field-5>0&lt;/csv-field-5>
  *   &lt;/record-3>
- * </code> </pre>
- * 
+ * </code>
+ * </pre>
+ *
  * And with a header row specified (and unique-record-names = true):
- * 
+ *
  * <pre>
  * <code>
  * &lt;csv-xml>
@@ -95,15 +101,18 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  *     &lt;Date_Attending>Aug 30, 2014 at 6:00 PM&lt;/Date_Attending>
  *     &lt;Total_Paid>0&lt;/Total_Paid>
  *   &lt;/record-2>
- * </code> </pre>
- * 
+ * </code>
+ * </pre>
+ *
  * @config simple-csv-to-xml-transform
- * 
+ * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
  */
+@Deprecated
 @XStreamAlias("simple-csv-to-xml-transform")
 @AdapterComponent
 @ComponentProfile(summary = "Easily transform a document from CSV to XML", tag = "service,transform,csv,xml")
 @DisplayOrder(order = {"format", "outputMessageEncoding", "elementNamesFromFirstRecord", "uniqueRecordNames", "stripIllegalXmlChars"})
+@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
 public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
 
   @InputFieldDefault(value = "false")
@@ -121,6 +130,7 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
   }
 
 
+  @Override
   protected Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
     CSVFormat format = getFormat().createFormat();
@@ -170,11 +180,11 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
 
   /**
    * Specify if element names should be derived from the first record.
-   * 
+   *
    * @param b true to set the first record as the header.
    */
   public void setElementNamesFromFirstRecord(Boolean b) {
-    this.elementNamesFromFirstRecord = b;
+    elementNamesFromFirstRecord = b;
   }
 
   boolean elemNamesFirstRec() {
@@ -215,19 +225,19 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
   public Boolean getUniqueRecordNames() {
     return uniqueRecordNames;
   }
-  
+
   /**
    * Specify whether or not to have unique element names for each record in the CSV file.
-   * 
+   *
    * <p>
    * If there are multiple records in then each record can have a unique element name; e.g <code>record-1, record-2, record-3</code>
    * and so on. If false, then they are all called <code>record</code> with an associated attribute that declares the line number.
    * </p>
-   * 
+   *
    * @param b true to generate a unique element name for each line in the CSV, default null (false)
    */
   public void setUniqueRecordNames(Boolean b) {
-    this.uniqueRecordNames = b;
+    uniqueRecordNames = b;
   }
 
   boolean uniqueRecords() {

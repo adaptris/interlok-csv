@@ -15,6 +15,7 @@ import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
 import com.adaptris.util.text.xml.XPath;
 
+@SuppressWarnings("deprecation")
 public class CsvToXmlTransformServiceTest extends TransformServiceExample {
 
   public static final String LINE_ENDING = System.getProperty("line.separator");
@@ -159,7 +160,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[3]/csv-field-2"));
     assertEquals("UTF-8", msg.getContentEncoding());
   }
-  
+
   @Test
   public void testDoService_NonUniqueRecords_IncludeLineNumberAttribute() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
@@ -173,7 +174,7 @@ public class CsvToXmlTransformServiceTest extends TransformServiceExample {
     assertEquals("Sep 16, 2012", xpath.selectSingleTextItem(doc, "/csv-xml/record[@line='3']/csv-field-2"));
     assertEquals("UTF-8", msg.getContentEncoding());
   }
-  
+
 
   @Test
   public void testDoService_RFC4180() throws Exception {
