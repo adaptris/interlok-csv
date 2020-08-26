@@ -1,28 +1,13 @@
 package com.adaptris.csv.aggregator;
 
+import org.apache.commons.lang3.BooleanUtils;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.CoreException;
-import com.adaptris.core.services.aggregator.MessageAggregatorImpl;
-
-import java.util.Collection;
-import java.util.List;
-
-import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Attempts to aggregate messages into a CSV file.
@@ -48,16 +33,10 @@ public class CsvValidatingAggregator extends CsvAggregating
   @AdvancedConfig
   @Getter
   @Setter
-  private Boolean forceColumns = Boolean.TRUE;
-
-  public CsvValidatingAggregator withHeader(String s) {
-    header = s;
-    return this;
-  }
+  private Boolean forceColumns;
 
   @Override
-  protected boolean forceColumns()
-  {
-    return ObjectUtils.defaultIfNull(forceColumns, true);
+  protected boolean forceColumns() {
+    return BooleanUtils.toBooleanDefaultIfNull(getForceColumns(), true);
   }
 }

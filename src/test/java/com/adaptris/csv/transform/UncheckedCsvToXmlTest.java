@@ -1,4 +1,4 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.csv.transform;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -8,13 +8,12 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.stubs.DefectiveMessageFactory;
-import com.adaptris.core.transform.TransformServiceExample;
 import com.adaptris.core.util.DocumentBuilderFactoryBuilder;
 import com.adaptris.core.util.XmlHelper;
+import com.adaptris.interlok.junit.scaffolding.services.TransformServiceExample;
 import com.adaptris.util.text.xml.XPath;
 
-@SuppressWarnings("deprecation")
-public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
+public class UncheckedCsvToXmlTest extends TransformServiceExample {
 
   private static final String LINE_ENDING = System.getProperty("line.separator");
 
@@ -38,15 +37,11 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
       + "\navailable: DEFAULT, RFC4180, MYSQL, EXCEL and TAB_DELIMITED" + "\n"
       + "\n-->\n";
 
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
 
   @Test
   public void testDoService() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
+    UncheckedCsvToXml svc = new UncheckedCsvToXml();
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -59,7 +54,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
   @Test
   public void testDoService_IncludeLineNumberAttribute() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
+    UncheckedCsvToXml svc = new UncheckedCsvToXml();
     svc.setIncludeLineNumberAttribute(true);
     execute(svc, msg);
     XPath xpath = new XPath();
@@ -73,7 +68,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
   @Test
   public void testDoService_Exception() throws Exception {
     AdaptrisMessage msg = new DefectiveMessageFactory().newMessage(CSV_INPUT);
-    RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
+    UncheckedCsvToXml svc = new UncheckedCsvToXml();
     try {
       execute(svc, msg);
       fail();
@@ -86,7 +81,7 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
   public void testDoService_NotCsv() throws Exception {
     // This is just a 3 line CSV file... (gasp).
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(NOT_CSV);
-    RawCsvToXmlTransformService svc = new RawCsvToXmlTransformService(new BasicFormatBuilder());
+    UncheckedCsvToXml svc = new UncheckedCsvToXml();
     execute(svc, msg);
     XPath xpath = new XPath();
     Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
@@ -97,8 +92,8 @@ public class RawCsvToXmlTransformServiceTest extends TransformServiceExample {
 
 
   @Override
-  protected RawCsvToXmlTransformService retrieveObjectForSampleConfig() {
-    return new RawCsvToXmlTransformService();
+  protected UncheckedCsvToXml retrieveObjectForSampleConfig() {
+    return new UncheckedCsvToXml();
   }
 
   @Override

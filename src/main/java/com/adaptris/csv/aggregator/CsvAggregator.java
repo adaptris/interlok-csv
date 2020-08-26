@@ -15,19 +15,7 @@
  *******************************************************************************/
 package com.adaptris.csv.aggregator;
 
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.adaptris.annotation.ComponentProfile;
-import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.CoreException;
-import com.adaptris.core.services.aggregator.MessageAggregatorImpl;
-import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -46,11 +34,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @ComponentProfile(summary = "Aggregate messages into a CSV, optionally prefixing a header", since = "3.9.3.1",
     tag = "csv,aggregator")
 public class CsvAggregator extends CsvAggregating {
-
-  public CsvAggregator withHeader(String s) {
-    setHeader(s);
-    return this;
-  }
 
   @Override
   protected boolean forceColumns() {

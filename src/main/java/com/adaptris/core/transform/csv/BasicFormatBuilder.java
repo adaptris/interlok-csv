@@ -1,33 +1,34 @@
 package com.adaptris.core.transform.csv;
 
 import javax.validation.constraints.NotNull;
-
 import org.apache.commons.csv.CSVFormat;
-
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Implementation of {@link FormatBuilder} that maps the standard commons-csv formats.
- * 
+ *
  * <p>
- * Basic parsing options are supported : {@link BasicFormatBuilder.Style#DEFAULT DEFAULT}, {@link BasicFormatBuilder.Style#EXCEL
- * EXCEL}, {@link BasicFormatBuilder.Style#RFC4180 RFC4180}, {@link BasicFormatBuilder.Style#MYSQL MYSQL} and
- * {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to the base formats defined by {@link CSVFormat}.
+ * Basic parsing options are supported : {@link BasicFormatBuilder.Style#DEFAULT DEFAULT},
+ * {@link BasicFormatBuilder.Style#EXCEL EXCEL}, {@link BasicFormatBuilder.Style#RFC4180 RFC4180},
+ * {@link BasicFormatBuilder.Style#MYSQL MYSQL} and {@link BasicFormatBuilder.Style#TAB_DELIMITED
+ * TAB DELIMITED} which correspond to the base formats defined by {@link CSVFormat}.
  * </p>
- * 
- * 
+ *
+ *
  * @config csv-basic-format
- * @author lchan
- * 
+ * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
  */
 @XStreamAlias("csv-basic-format")
+@Deprecated
+@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
 public class BasicFormatBuilder implements FormatBuilder {
 
   /**
    * enum representing the standard supported CSV Formats.
-   * 
+   *
    * @see CSVFormat
    */
   public enum Style {
@@ -66,7 +67,7 @@ public class BasicFormatBuilder implements FormatBuilder {
     },
     /**
      * Corresponds to {@link CSVFormat#MYSQL}.
-     * 
+     *
      * <p>
      * Default MySQL format used by the <tt>SELECT INTO OUTFILE</tt> and <tt>LOAD DATA INFILE</tt> operations.
      * </p>
@@ -130,7 +131,7 @@ public class BasicFormatBuilder implements FormatBuilder {
   }
 
   public void setStyle(Style csvFormat) {
-    this.style = Args.notNull(csvFormat, "style");
+    style = Args.notNull(csvFormat, "style");
   }
 
   @Override
