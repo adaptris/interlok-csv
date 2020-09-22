@@ -1,5 +1,5 @@
 package com.adaptris.csv.splitter;
-import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.LINE_ENDING;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.util.List;
@@ -13,6 +13,7 @@ import com.adaptris.interlok.util.CloseableIterable;
  * @author mwarman
  */
 public class CsvMetadataSplitterTest {
+  public static final String LINE_ENDING = System.getProperty("line.separator");
 
   private static final String CSV_INPUT_FIELD = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
       + "Record1,\"Sep 15, 2012\",,0" + LINE_ENDING

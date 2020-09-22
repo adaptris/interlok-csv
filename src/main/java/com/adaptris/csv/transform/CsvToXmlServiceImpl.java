@@ -1,41 +1,58 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.csv.transform;
 
 import java.io.OutputStream;
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.supercsv.prefs.CsvPreference;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import com.adaptris.annotation.AdvancedConfig;
-import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.InputFieldDefault;
-import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.XmlHelper;
+import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.BasicPreferenceBuilder.Style;
+import com.adaptris.csv.PreferenceBuilder;
 import com.adaptris.util.XmlUtils;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Base class for transforming CSV into XML.
  *
- * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
- *
  */
-@Deprecated
-@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
+@NoArgsConstructor
 public abstract class CsvToXmlServiceImpl extends CsvXmlTransformImpl {
 
-  @NotNull
-  @AutoPopulated
-  private FormatBuilder format;
+  /**
+   * How to parse the CSV file.
+   *
+   */
+  @Valid
+  @Getter
+  @Setter
+  @InputFieldDefault(value = "csv-basic-preference-builder")
+  private PreferenceBuilder preferenceBuilder;
+  /**
+   * Specify whether or not to strip illegal XML characters from all the data before converting to
+   * XML.
+   * <p>
+   * The following regular expression is used to strip out all invalid XML 1.0 characters :
+   * <code>"[^\u0009\r\n\u0020-\uD7FF\uE000-\uFFFD\ud800\udc00-\udbff\udfff]"</code>.
+   * </p>
+   *
+   */
+  @Getter
+  @Setter
   @InputFieldDefault(value = "true")
   @AdvancedConfig
   private Boolean stripIllegalXmlChars = null;
-
-  public CsvToXmlServiceImpl() {
-    setFormat(new BasicFormatBuilder());
-  }
 
   @Override
   public void doService(AdaptrisMessage msg) throws ServiceException {
@@ -51,37 +68,13 @@ public abstract class CsvToXmlServiceImpl extends CsvXmlTransformImpl {
 
   protected abstract Document transform(AdaptrisMessage msg) throws ServiceException;
 
-  public FormatBuilder getFormat() {
-    return format;
-  }
-
-  public void setFormat(FormatBuilder csvFormat) {
-    format = Args.notNull(csvFormat, "format");
-  }
-
-  public Boolean getStripIllegalXmlChars() {
-    return stripIllegalXmlChars;
-  }
-
-  /**
-   * Specify whether or not to strip illegal XML characters from all the data before converting to XML.
-   * <p>
-   * The following regular expression is used to strip out all invalid XML 1.0 characters :
-   * <code>"[^\u0009\r\n\u0020-\uD7FF\uE000-\uFFFD\ud800\udc00-\udbff\udfff]"</code>.
-   * </p>
-   *
-   * @param s true to enable stripping, default is null (true)
-   */
-  public void setStripIllegalXmlChars(Boolean s) {
-    stripIllegalXmlChars = s;
-  }
-
   protected boolean stripIllegalXmlChars() {
-    return getStripIllegalXmlChars() != null ? getStripIllegalXmlChars().booleanValue() : true;
+    return BooleanUtils.toBooleanDefaultIfNull(getStripIllegalXmlChars(), true);
   }
 
   protected Node createTextNode(Document doc, String value) {
-    String munged = stripIllegalXmlChars() ? XmlHelper.stripIllegalXmlCharacters(value) : value;
+    String v = StringUtils.defaultIfEmpty(value, "");
+    String munged = stripIllegalXmlChars() ? XmlHelper.stripIllegalXmlCharacters(v) : v;
     return doc.createTextNode(munged);
   }
 
@@ -106,4 +99,8 @@ public abstract class CsvToXmlServiceImpl extends CsvXmlTransformImpl {
     }
   }
 
+  protected CsvPreference buildPreferences() {
+    return ObjectUtils.defaultIfNull(getPreferenceBuilder(),
+        new BasicPreferenceBuilder(Style.STANDARD_PREFERENCE)).build();
+  }
 }

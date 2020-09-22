@@ -1,12 +1,9 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.csv.transform;
 
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.BooleanUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,27 +11,20 @@ import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
-import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.util.LoggingHelper;
-import com.adaptris.core.util.XmlHelper;
+import com.adaptris.csv.OrderedCsvMapReader;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * Simple CSV to XML using {@link CSVParser}.
- *
+ * CSV to XML using {@code net.sf.supercsv:super-csv} replacing
+ * {@link com.adaptris.core.transform.csv.SimpleCsvToXmlTransformService}.
  * <p>
- * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a>
- * as the parsing engine for a CSV file. Basic parsing options are supported :
- * {@link BasicFormatBuilder.Style#DEFAULT DEFAULT}, {@link BasicFormatBuilder.Style#EXCEL EXCEL},
- * {@link BasicFormatBuilder.Style#RFC4180 RFC4180}, {@link BasicFormatBuilder.Style#MYSQL MYSQL}
- * and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to the base
- * formats defined by {@link CSVFormat}. Custom CSV formats are provided via
- * {@link CustomFormatBuilder}. In the event that you have more complex requirements then you should
- * be looking to use the {@code FlatFileTransformService} instead.
- * </p>
+ * This transformation uses {@code net.sf.supercsv:super-csv} as the parsing engine for a CSV file
+ * to write each row as part of an XML document.
  * <p>
  * If {@link #setElementNamesFromFirstRecord(Boolean)} is true, then the first record is used to
  * generate the element names; otherwise names are auto-generated based on the count of fields in
@@ -106,60 +96,58 @@ Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
  * </code>
  * </pre>
  *
- * @config simple-csv-to-xml-transform
- * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
+ * @config csv-to-xml-transform
  */
-@Deprecated
-@XStreamAlias("simple-csv-to-xml-transform")
+@XStreamAlias("csv-to-xml-transform")
 @AdapterComponent
-@ComponentProfile(summary = "Easily transform a document from CSV to XML", tag = "service,transform,csv,xml")
+@ComponentProfile(summary = "Transform a document from CSV to XML",
+    tag = "service,transform,csv,xml", since = "3.11.0")
 @DisplayOrder(order = {"format", "outputMessageEncoding", "elementNamesFromFirstRecord", "uniqueRecordNames", "stripIllegalXmlChars"})
-@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
-public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
+@NoArgsConstructor
+public class CsvToXml extends CsvToXmlServiceImpl {
 
+  /**
+   * Specify if element names should be derived from the first record.
+   *
+   */
   @InputFieldDefault(value = "false")
+  @Getter
+  @Setter
   private Boolean elementNamesFromFirstRecord;
+  /**
+   * Specify whether or not to have unique element names for each record in the CSV file.
+   *
+   * <p>
+   * If there are multiple records in then each record can have a unique element name; e.g
+   * <code>record-1, record-2, record-3</code> and so on. If false, then they are all called
+   * <code>record</code> with an associated attribute that declares the line number.
+   * </p>
+   *
+   */
   @InputFieldDefault(value = "false")
+  @Getter
+  @Setter
   private Boolean uniqueRecordNames = null;
-
-  private transient boolean warningLogged;
-
-  public SimpleCsvToXmlTransformService() {
-    super();
-  }
-
-  public SimpleCsvToXmlTransformService(FormatBuilder f) {
-    this();
-    setFormat(f);
-  }
-
-  @Override
-  public void prepare() throws CoreException {
-    LoggingHelper.logDeprecation(warningLogged, () -> warningLogged = true,
-        this.getClass().getCanonicalName(),
-        com.adaptris.csv.transform.CsvToXml.class.getCanonicalName());
-    super.prepare();
-  }
 
   @Override
   protected Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
-    CSVFormat format = getFormat().createFormat();
+    String encoding = evaluateEncoding(msg);
 
-    try (Reader in = msg.getReader()) {
+    try (Reader in = msg.getReader();
+        OrderedCsvMapReader csvReader =
+            new OrderedCsvMapReader(in, buildPreferences());) {
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-
-      CSVParser parser = format.parse(in);
       int recordCount = 1;
       boolean firstRecord = true;
       List<String> elemNames = null;
       Element root = doc.createElement(XML_ROOT_ELEMENT);
       doc.appendChild(root);
-      for (CSVRecord record : parser) {
+      for (List<String> record; (record = csvReader.readNext()) != null;) {
         if (firstRecord) {
           firstRecord = false;
           if (elemNamesFirstRec()) {
-            elemNames = createElementNames(record);
+            elemNames = safeElementNames(record);
             continue;
           }
           else {
@@ -185,20 +173,7 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
     return doc;
   }
 
-  public Boolean getElementNamesFromFirstRecord() {
-    return elementNamesFromFirstRecord;
-  }
-
-  /**
-   * Specify if element names should be derived from the first record.
-   *
-   * @param b true to set the first record as the header.
-   */
-  public void setElementNamesFromFirstRecord(Boolean b) {
-    elementNamesFromFirstRecord = b;
-  }
-
-  boolean elemNamesFirstRec() {
+  private boolean elemNamesFirstRec() {
     return BooleanUtils.toBooleanDefaultIfNull(getElementNamesFromFirstRecord(), false);
   }
 
@@ -208,18 +183,10 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
     for (int i = 1; i <= count; i++) {
       result.add(CSV_FIELD_NAME + "-" + i);
     }
-    return result;
+    return safeElementNames(result);
   }
 
-  private final List<String> createElementNames(CSVRecord hdr) {
-    List<String> result = new ArrayList<>();
-    for (String hdrValue : hdr) {
-      result.add(safeElementName(hdrValue));
-    }
-    return result;
-  }
-
-  private List<Element> createFields(Document doc, CSVRecord record, List<String> headerNames) {
+  private List<Element> createFields(Document doc, List<String> record, List<String> headerNames) {
     List<Element> result = new ArrayList<>();
     for (int i = 0; i < record.size(); i++) {
       Element element = doc.createElement(headerNames.get(i));
@@ -229,29 +196,7 @@ public class SimpleCsvToXmlTransformService extends CsvToXmlServiceImpl {
     return result;
   }
 
-  private String safeElementName(String input) {
-    return XmlHelper.safeElementName(input, "blank");
-  }
-
-  public Boolean getUniqueRecordNames() {
-    return uniqueRecordNames;
-  }
-
-  /**
-   * Specify whether or not to have unique element names for each record in the CSV file.
-   *
-   * <p>
-   * If there are multiple records in then each record can have a unique element name; e.g <code>record-1, record-2, record-3</code>
-   * and so on. If false, then they are all called <code>record</code> with an associated attribute that declares the line number.
-   * </p>
-   *
-   * @param b true to generate a unique element name for each line in the CSV, default null (false)
-   */
-  public void setUniqueRecordNames(Boolean b) {
-    uniqueRecordNames = b;
-  }
-
-  boolean uniqueRecords() {
+  private boolean uniqueRecords() {
     return BooleanUtils.toBooleanDefaultIfNull(getUniqueRecordNames(), false);
   }
 

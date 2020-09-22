@@ -1,36 +1,24 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.csv.transform;
 
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
-import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.csv.OrderedCsvMapReader;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.NoArgsConstructor;
 
 /**
- * Raw CSV to XML using {@link CSVParser}.
+ * Unchecked CSV to XML using {@code net.sf.supercsv:super-csv} that replaces
+ * {@link com.adaptris.core.transform.csv.RawCsvToXmlTransformService}.
  *
- * <p>
- * This transformation uses <a href="http://commons.apache.org/proper/commons-csv/">commons-csv</a>
- * as the parsing engine for a CSV file. Basic parsing options are supported :
- * {@link BasicFormatBuilder.Style#DEFAULT DEFAULT}, {@link BasicFormatBuilder.Style#EXCEL EXCEL},
- * {@link BasicFormatBuilder.Style#RFC4180 RFC4180}, {@link BasicFormatBuilder.Style#MYSQL MYSQL}
- * and {@link BasicFormatBuilder.Style#TAB_DELIMITED TAB DELIMITED} which correspond to the base
- * formats defined by {@link CSVFormat}. Custom CSV formats are provided via
- * {@link CustomFormatBuilder}.
- * </p>
  * <p>
  * This service does not attempt to make parsing decisions, so CSV files that have differing number
  * of columns on each line would be perfectly acceptable.
@@ -92,47 +80,28 @@ TRAILER,4
  * using this as part of a workflow. Behaviour with rogue messages may not be as you expect.
  * </p>
  *
- * @config raw-csv-to-xml-transform
- * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
+ * @config unchecked-csv-to-xml-transform
  */
-@Deprecated
-@XStreamAlias("raw-csv-to-xml-transform")
+@XStreamAlias("unchecked-csv-to-xml-transform")
 @AdapterComponent
-@ComponentProfile(summary = "Easily transform a document from CSV to XML", tag = "service,transform,csv,xml")
+@ComponentProfile(summary = "Easily transform a document from CSV to XML",
+    tag = "service,transform,csv,xml", since = "3.11.0")
 @DisplayOrder(order = {"format", "outputMessageEncoding", "stripIllegalXmlChars"})
-@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
-public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
+@NoArgsConstructor
+public class UncheckedCsvToXml extends CsvToXmlServiceImpl {
 
-  private transient boolean warningLogged;
-  public RawCsvToXmlTransformService() {
-    super();
-  }
-
-  public RawCsvToXmlTransformService(FormatBuilder f) {
-    this();
-    setFormat(f);
-  }
-
-  @Override
-  public void prepare() throws CoreException {
-    LoggingHelper.logDeprecation(warningLogged, () -> warningLogged = true,
-        this.getClass().getCanonicalName(),
-        com.adaptris.csv.transform.UncheckedCsvToXml.class.getCanonicalName());
-    super.prepare();
-  }
 
   @Override
   protected Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
-    CSVFormat format = getFormat().createFormat();
-
-    try (Reader in = msg.getReader()) {
+    try (Reader in = msg.getReader();
+        OrderedCsvMapReader csvReader =
+            new OrderedCsvMapReader(in, buildPreferences());) {
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      CSVParser parser = format.parse(in);
       Element root = doc.createElement(XML_ROOT_ELEMENT);
       doc.appendChild(root);
       int recordCount = 1;
-      for (CSVRecord record : parser) {
+      for (List<String> record; (record = csvReader.readNext()) != null;) {
         Element recordElement = addNewElement(doc, root, CSV_RECORD_NAME);
         if (includeLineNumberAttribute()) {
           recordElement.setAttribute("line", String.valueOf(recordCount));
@@ -156,7 +125,7 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
     return CSV_FIELD_NAME + "-" + (count + 1);
   }
 
-  private List<Element> createFields(Document doc, CSVRecord record) {
+  private List<Element> createFields(Document doc, List<String> record) {
     List<Element> result = new ArrayList<>();
     for (int i = 0; i < record.size(); i++) {
       Element element = doc.createElement(createElementName(i));
@@ -165,6 +134,5 @@ public class RawCsvToXmlTransformService extends CsvToXmlServiceImpl {
     }
     return result;
   }
-
 
 }

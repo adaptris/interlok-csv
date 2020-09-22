@@ -1,37 +1,61 @@
-package com.adaptris.core.transform.csv;
+package com.adaptris.csv.transform;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceImp;
+import com.adaptris.core.util.XmlHelper;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Base class for transforming CSV into XML.
  *
- * @deprecated since 3.11.0 : switch to using net.supercsv based implementations instead
  */
-@Deprecated
-@Removal(version = "4.0.0", message = "Switch to using net.supercsv based implementations instead")
+@NoArgsConstructor
 public abstract class CsvXmlTransformImpl extends ServiceImp {
 
   protected static final String CSV_RECORD_NAME = "record";
   protected static final String XML_ROOT_ELEMENT = "csv-xml";
   protected static final String CSV_FIELD_NAME = "csv-field";
 
+  /**
+   * Set the encoding for the resulting XML document.
+   * <p>
+   * If not specified the following rules will be applied:
+   * </p>
+   * <ol>
+   * <li>If the {@link AdaptrisMessage#getCharEncoding()} is non-null then that will be used.</li>
+   * <li>UTF-8</li>
+   * </ol>
+   * <p>
+   * As a result; the character encoding on the message is always set using
+   * {@link AdaptrisMessage#setCharEncoding(String)}.
+   * </p>
+   *
+   */
   @AdvancedConfig
   @InputFieldHint(expression = true)
+  @Getter
+  @Setter
   private String outputMessageEncoding = null;
+  /**
+   * Specify whether or not to include the line number as an attribute on each record.
+   *
+   *
+   */
   @InputFieldDefault(value = "false")
+  @Getter
+  @Setter
   private Boolean includeLineNumberAttribute = null;
-
-  public CsvXmlTransformImpl() {
-  }
 
   @Override
   protected void initService() throws CoreException {}
@@ -44,28 +68,6 @@ public abstract class CsvXmlTransformImpl extends ServiceImp {
   @Override
   public void prepare() throws CoreException {}
 
-  public String getOutputMessageEncoding() {
-    return outputMessageEncoding;
-  }
-
-  /**
-   * Set the encoding for the resulting XML document.
-   * <p>
-   * If not specified the following rules will be applied:
-   * </p>
-   * <ol>
-   * <li>If the {@link AdaptrisMessage#getCharEncoding()} is non-null then that will be used.</li>
-   * <li>UTF-8</li>
-   * </ol>
-   * <p>
-   * As a result; the character encoding on the message is always set using {@link AdaptrisMessage#setCharEncoding(String)}.
-   * </p>
-   *
-   * @param encoding the character
-   */
-  public void setOutputMessageEncoding(String encoding) {
-    outputMessageEncoding = encoding;
-  }
 
   protected String evaluateEncoding(AdaptrisMessage msg) {
     String encoding = "UTF-8";
@@ -78,22 +80,21 @@ public abstract class CsvXmlTransformImpl extends ServiceImp {
     return encoding;
   }
 
-
-  public Boolean getIncludeLineNumberAttribute() {
-    return includeLineNumberAttribute;
-  }
-
-  /**
-   * Specify whether or not to include the line number as an attribute on each record.
-   *
-   *
-   * @param b whether to include the line number attribute default null (false)
-   */
-  public void setIncludeLineNumberAttribute(Boolean b) {
-    includeLineNumberAttribute = b;
-  }
-
   protected boolean includeLineNumberAttribute() {
     return BooleanUtils.toBooleanDefaultIfNull(getIncludeLineNumberAttribute(), false);
   }
+
+
+  protected static String[] safeElementNames(String[] input) {
+    for (int i = 0; i < input.length; i++) {
+      input[i] = XmlHelper.safeElementName(input[i], "blank");
+    }
+    return input;
+  }
+
+  protected static List<String> safeElementNames(List<String> input) {
+    return input.stream().map((s) -> XmlHelper.safeElementName(s, "blank"))
+        .collect(Collectors.toList());
+  }
+
 }

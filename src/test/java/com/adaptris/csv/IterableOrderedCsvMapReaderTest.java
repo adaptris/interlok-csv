@@ -1,18 +1,18 @@
 package com.adaptris.csv;
 
-import org.junit.Test;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
-
-import static com.adaptris.core.transform.csv.CsvToXmlTransformServiceTest.LINE_ENDING;
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author mwarman
  */
 public class IterableOrderedCsvMapReaderTest {
+  public static final String LINE_ENDING = System.getProperty("line.separator");
 
   private static final String CSV_INPUT_FIELD = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
       + "Record1,\"Sep 15, 2012\",,0" + LINE_ENDING
