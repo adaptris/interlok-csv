@@ -9,6 +9,7 @@ import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.CoreException;
+import com.adaptris.core.services.conditional.conditions.ConditionNever;
 import com.adaptris.core.stubs.DefectiveMessageFactory;
 import com.adaptris.core.stubs.DefectiveMessageFactory.WhenToBreak;
 
@@ -68,4 +69,19 @@ public class CsvAggregatorTest {
     // assertEquals("\"\",", actualLines.get(4)); // forced an empty value
     assertEquals("k6,v6", actualLines.get(5));
   }
+
+  @Test
+  public void testAggregate_WithCondition() throws Exception {
+    CsvAggregator csvAggregator = new CsvAggregator().withHeader("key,value");
+    csvAggregator.setFilterCondition(new ConditionNever());
+    AdaptrisMessage message = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    csvAggregator.aggregate(message,
+        Arrays.asList(AdaptrisMessageFactory.getDefaultInstance().newMessage("k1,v1\nk2,v2\n"),
+            AdaptrisMessageFactory.getDefaultInstance().newMessage("k3,v3\nk4,v4\n")));
+    List<String> actualLines = IOUtils.readLines(new StringReader(message.getContent()));
+    assertEquals(1, actualLines.size());
+    // All data is filtered out.
+    assertEquals("key,value", actualLines.get(0));
+  }
+
 }

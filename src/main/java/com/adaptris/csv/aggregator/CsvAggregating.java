@@ -45,20 +45,29 @@ public abstract class CsvAggregating extends MessageAggregatorImpl
   private PreferenceBuilder preferenceBuilder;
 
   @Override
-  public void joinMessage(AdaptrisMessage message, Collection<AdaptrisMessage> messages)
+  public void joinMessage(AdaptrisMessage msg, Collection<AdaptrisMessage> msgs)
       throws CoreException {
-    String resolvedHeader = message.resolve(getHeader());
+    aggregate(msg, msgs);
+  }
+
+  @Override
+  public void aggregate(AdaptrisMessage original, Iterable<AdaptrisMessage> msgs)
+      throws CoreException {
+    String resolvedHeader = original.resolve(getHeader());
     CsvPreference prefs = buildPreferences();
 
-    try (CsvListWriter csvWriter = new CsvListWriter(message.getWriter(),prefs)) {
+    try (CsvListWriter csvWriter = new CsvListWriter(original.getWriter(), prefs)) {
       int columnCount = writeHeaders(csvWriter, resolvedHeader, prefs);
-      for (AdaptrisMessage m : messages) {
-        try (Reader in = m.getReader();
-            OrderedCsvMapReader csvReader = new OrderedCsvMapReader(in, buildPreferences())) {
-          for (List<String> record; (record = csvReader.readNext()) != null;) {
-            assertColumnCount(columnCount, record);
-            csvWriter.write(record);
+      for (AdaptrisMessage m : msgs) {
+        if (filter(m)) {
+          try (Reader in = m.getReader();
+              OrderedCsvMapReader csvReader = new OrderedCsvMapReader(in, buildPreferences())) {
+            for (List<String> record; (record = csvReader.readNext()) != null;) {
+              assertColumnCount(columnCount, record);
+              csvWriter.write(record);
+            }
           }
+          overwriteMetadata(m, original);
         }
       }
     } catch (Exception e) {
