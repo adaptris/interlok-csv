@@ -9,8 +9,6 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 import com.adaptris.annotation.InputFieldDefault;
@@ -28,7 +26,6 @@ import lombok.Setter;
 
 public abstract class CsvAggregating extends MessageAggregatorImpl
 {
-  private static final transient Logger log = LoggerFactory.getLogger(CsvValidatingAggregator.class);
 
   @InputFieldHint(expression = true)
   @Getter
@@ -45,20 +42,29 @@ public abstract class CsvAggregating extends MessageAggregatorImpl
   private PreferenceBuilder preferenceBuilder;
 
   @Override
-  public void joinMessage(AdaptrisMessage message, Collection<AdaptrisMessage> messages)
+  public void joinMessage(AdaptrisMessage msg, Collection<AdaptrisMessage> msgs)
       throws CoreException {
-    String resolvedHeader = message.resolve(getHeader());
+    aggregate(msg, msgs);
+  }
+
+  @Override
+  public void aggregate(AdaptrisMessage original, Iterable<AdaptrisMessage> msgs)
+      throws CoreException {
+    String resolvedHeader = original.resolve(getHeader());
     CsvPreference prefs = buildPreferences();
 
-    try (CsvListWriter csvWriter = new CsvListWriter(message.getWriter(),prefs)) {
+    try (CsvListWriter csvWriter = new CsvListWriter(original.getWriter(), prefs)) {
       int columnCount = writeHeaders(csvWriter, resolvedHeader, prefs);
-      for (AdaptrisMessage m : messages) {
-        try (Reader in = m.getReader();
-            OrderedCsvMapReader csvReader = new OrderedCsvMapReader(in, buildPreferences())) {
-          for (List<String> record; (record = csvReader.readNext()) != null;) {
-            assertColumnCount(columnCount, record);
-            csvWriter.write(record);
+      for (AdaptrisMessage m : msgs) {
+        if (filter(m)) {
+          try (Reader in = m.getReader();
+              OrderedCsvMapReader csvReader = new OrderedCsvMapReader(in, buildPreferences())) {
+            for (List<String> record; (record = csvReader.readNext()) != null;) {
+              assertColumnCount(columnCount, record);
+              csvWriter.write(record);
+            }
           }
+          overwriteMetadata(m, original);
         }
       }
     } catch (Exception e) {
