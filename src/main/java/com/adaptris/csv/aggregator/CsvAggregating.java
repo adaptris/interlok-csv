@@ -9,8 +9,6 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 import com.adaptris.annotation.InputFieldDefault;
@@ -28,7 +26,6 @@ import lombok.Setter;
 
 public abstract class CsvAggregating extends MessageAggregatorImpl
 {
-  private static final transient Logger log = LoggerFactory.getLogger(CsvValidatingAggregator.class);
 
   @InputFieldHint(expression = true)
   @Getter
