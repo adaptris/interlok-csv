@@ -282,8 +282,8 @@ publishing {
       pom.withXml {
         asNode().appendNode("description", "Handling CSV files using Interlok; transform to XML, splitting, JDBC utilities")
         asNode().appendNode("name", componentName)
+        asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/pages/cookbook/cookbook-csv-transform")
         def properties = asNode().appendNode("properties")
-        properties.appendNode("url", "http://interlok.adaptris.net/interlok-docs/cookbook-csv-transform.html")
         properties.appendNode("target", "3.8.0+")
         properties.appendNode("tags", "csv,transform,jdbc")
         properties.appendNode("license", "false")
