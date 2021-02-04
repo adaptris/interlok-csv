@@ -129,7 +129,8 @@ dependencies {
     changing= true
     exclude group: "org.apache.logging.log4j"
   }
-  testCompile ("org.apache.derby:derby:10.14.2.0")
+  testCompile ("org.apache.derby:derby:10.15.2.0")
+  testCompile ("org.apache.derby:derbytools:10.15.2.0")
   testCompile ("org.mockito:mockito-core:3.7.0")
   testCompile ("org.mockito:mockito-inline:3.7.0")
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
