@@ -27,7 +27,8 @@ ext {
 
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
 
-  componentName='Interlok/CSV'
+  componentName='Interlok Transform/CSV'
+  componentDesc="Handling CSV files using Interlok; transform to XML, splitting, JDBC utilities"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
@@ -162,6 +163,7 @@ task generateVersion {
     versionFile.getParentFile().mkdirs()
     ant.propertyfile(file: versionFile) {
       entry(key: 'component.name', value: componentName)
+      entry(key: 'component.description', value: componentDesc)
       entry(key: 'groupId', value: project.group)
       entry(key: 'artifactId', value: project.name)
       entry(key: 'build.version', value: releaseVersion)
@@ -285,7 +287,7 @@ publishing {
       artifact sourcesJar { classifier "sources" }
 
       pom.withXml {
-        asNode().appendNode("description", "Handling CSV files using Interlok; transform to XML, splitting, JDBC utilities")
+        asNode().appendNode("description", componentDesc)
         asNode().appendNode("name", componentName)
         asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/pages/cookbook/cookbook-csv-transform")
         def properties = asNode().appendNode("properties")
