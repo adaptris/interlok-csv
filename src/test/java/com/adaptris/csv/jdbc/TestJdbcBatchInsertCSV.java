@@ -13,10 +13,6 @@ import com.adaptris.core.services.jdbc.JdbcMapInsert;
 
 public class TestJdbcBatchInsertCSV extends JdbcCSVInsertCase {
 
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
 
   @Test
   public void testAccumulate() throws Exception {

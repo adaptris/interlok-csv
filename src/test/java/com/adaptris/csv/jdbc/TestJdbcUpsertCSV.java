@@ -21,10 +21,6 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
   protected static final String CAROL = "carol";
   protected static final String DOB = "2017-01-03";
   
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
 
   @Test
   public void testService_Insert() throws Exception {
