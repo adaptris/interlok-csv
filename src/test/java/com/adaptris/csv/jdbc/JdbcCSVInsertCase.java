@@ -9,28 +9,28 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import org.junit.Test;
 import com.adaptris.core.CoreException;
-import com.adaptris.core.ServiceCase;
 import com.adaptris.core.jdbc.JdbcConnection;
 import com.adaptris.core.services.jdbc.JdbcMapInsert;
 import com.adaptris.core.util.JdbcUtil;
 import com.adaptris.core.util.LifecycleHelper;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 import com.adaptris.util.TimeInterval;
 
-public abstract class JdbcCSVInsertCase extends ServiceCase {
+public abstract class JdbcCSVInsertCase extends ExampleServiceCase {
 
 
   protected static final String CSV_CONTENT =
-      "firstname, lastname, dob\n" + 
+      "firstname, lastname, dob\n" +
           "alice,smith,2017-01-01\n" +
-      "bob,smith,2017-01-02\n" + 
+      "bob,smith,2017-01-02\n" +
       "carol,smith,2017-01-03";
 
   protected static final String INVALID_COLUMNS_CONTENT =
-      "$firstname, $lastname, dob\n" + 
-          "alice,smith,2017-01-01\n" + 
-      "bob,smith,2017-01-02\n" + 
+      "$firstname, $lastname, dob\n" +
+          "alice,smith,2017-01-01\n" +
+      "bob,smith,2017-01-02\n" +
       "carol,smith,2017-01-03";
-  
+
   protected static final String CSV_JDBC_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
   protected static final String CSV_JDBC_URL = "jdbc:derby:memory:CSV_DB;create=true";
   protected static final String TABLE_NAME = "people";
