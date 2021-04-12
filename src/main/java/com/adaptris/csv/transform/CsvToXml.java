@@ -132,8 +132,6 @@ public class CsvToXml extends CsvToXmlServiceImpl {
   @Override
   protected Document transform(AdaptrisMessage msg) throws ServiceException {
     Document doc = null;
-    String encoding = evaluateEncoding(msg);
-
     try (Reader in = msg.getReader();
         OrderedCsvMapReader csvReader =
             new OrderedCsvMapReader(in, buildPreferences());) {

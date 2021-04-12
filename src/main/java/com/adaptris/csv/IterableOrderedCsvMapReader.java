@@ -8,7 +8,7 @@ import java.util.Map;
 import org.supercsv.prefs.CsvPreference;
 
 import com.adaptris.core.util.Args;
-import com.adaptris.core.util.CloseableIterable;
+import com.adaptris.interlok.util.CloseableIterable;
 
 /**
  * @author mwarman

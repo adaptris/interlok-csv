@@ -19,7 +19,7 @@ import com.adaptris.core.CoreException;
 import com.adaptris.core.services.splitter.MessageSplitter;
 import com.adaptris.core.services.splitter.MessageSplitterImp;
 import com.adaptris.core.util.Args;
-import com.adaptris.core.util.CloseableIterable;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.OrderedCsvMapReader;
