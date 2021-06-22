@@ -31,9 +31,9 @@ ext {
   componentDesc="Handling CSV files using Interlok; transform to XML, splitting, JDBC utilities"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.30'
+  slf4jVersion = '1.7.31'
   junitJupiterVersion = '5.4.0'
-  mockitoVersion = '3.11.1'
+  mockitoVersion = '3.11.2'
 }
 
 ext.hasGraphViz = { ->
