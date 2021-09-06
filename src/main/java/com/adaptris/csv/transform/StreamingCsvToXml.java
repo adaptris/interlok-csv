@@ -36,14 +36,15 @@ import lombok.NonNull;
  * CSV to XML using {@code net.sf.supercsv:super-csv} via {@link XMLStreamWriter}
  *
  * <p>
- * This transformation uses {@code net.sf.supercsv:super-csv} as the parsing engine for a CSV file and uses {@link XMLStreamWriter}
- * via {@code com.adaptris:interlok-stax} to write each row as part of an XML document. It may have better performance
- * characteristics with large CSV files compared to {@link CsvToXml}. It also reduces the number of
- * configuration options that are available.
+ * This transformation uses {@code net.sf.supercsv:super-csv} as the parsing engine for a CSV file
+ * and uses {@link XMLStreamWriter} via {@code com.adaptris:interlok-stax} to write each row as part
+ * of an XML document. It may have better performance characteristics with large CSV files compared
+ * to {@link CsvToXml}. It also reduces the number of configuration options that are available.
  * <p>
- * Element names are always generated from the first line; so a header line is always assumed; Note that if your header rows
- * contains characters that would not be allowed in an standard XML element name then it will be replaced with an '_', so "Order
- * Date" becomes "Order_Date". Additionally illegal XML characters are always stripped (illegal characters would cause an exception
+ * Element names are always generated from the first line; so a header line is always assumed; Note
+ * that if your header rows contains characters that would not be allowed in an standard XML element
+ * name then it will be replaced with an '_', so "Order Date" becomes "Order_Date". Additionally
+ * illegal XML characters are always stripped (illegal characters would cause an exception
  * regardless in the {@link XMLStreamWriter}).
  * </p>
  * <p>
@@ -54,26 +55,30 @@ import lombok.NonNull;
 Event Name,Order Date,Ticket Type,Date Attending,Total Paid
 Glastonbury,"Sep 15, 2012",Free entry,"Jun 26, 2014 at 6:00 PM",0
 Reading Festival,"Sep 16, 2012",Free entry,"Aug 30, 2014 at 6:00 PM",0
- * </code> </pre> Then the output (without a header row) would be
+ * </code>
+ * </pre>
+ * 
+ * Then the output (without a header row) would be
  *
  * <pre>
  * <code>
- * &lt;csv-xml>
- *   &lt;record line="1">
- *     &lt;Event_Name>Glastonbury&lt;/Event_Name>
- *     &lt;Order_Date>Sep 15, 2012&lt;/Order_Date>
- *     &lt;Ticket_Type>Free entry&lt;/Ticket_Type>
- *     &lt;Date_Attending>Jun 26, 2014 at 6:00 PM&lt;/Date_Attending>
- *     &lt;Total_Paid>0&lt;/Total_Paid>
- *   &lt;/record>
- *   &lt;record line="2">
- *     &lt;Event_Name>Reading Festival&lt;/Event_Name>
- *     &lt;Order_Date>Sep 16, 2012&lt;/Order_Date>
- *     &lt;Ticket_Type>Free entry&lt;/Ticket_Type>
- *     &lt;Date_Attending>Aug 30, 2014 at 6:00 PM&lt;/Date_Attending>
- *     &lt;Total_Paid>0&lt;/Total_Paid>
- *   &lt;/record>
- * </code> </pre>
+ * &lt;csv-xml&gt;
+ *   &lt;record line="1"&gt;
+ *     &lt;Event_Name&gt;Glastonbury&lt;/Event_Name&gt;
+ *     &lt;Order_Date&gt;Sep 15, 2012&lt;/Order_Date&gt;
+ *     &lt;Ticket_Type&gt;Free entry&lt;/Ticket_Type&gt;
+ *     &lt;Date_Attending&gt;Jun 26, 2014 at 6:00 PM&lt;/Date_Attending&gt;
+ *     &lt;Total_Paid&gt;0&lt;/Total_Paid&gt;
+ *   &lt;/record&gt;
+ *   &lt;record line="2"&gt;
+ *     &lt;Event_Name&gt;Reading Festival&lt;/Event_Name&gt;
+ *     &lt;Order_Date&gt;Sep 16, 2012&lt;/Order_Date&gt;
+ *     &lt;Ticket_Type&gt;Free entry&lt;/Ticket_Type&gt;
+ *     &lt;Date_Attending&gt;Aug 30, 2014 at 6:00 PM&lt;/Date_Attending&gt;
+ *     &lt;Total_Paid&gt;0&lt;/Total_Paid&gt;
+ *   &lt;/record&gt;
+ * </code>
+ * </pre>
  *
  * @config streaming-csv-to-xml-transform
  *
