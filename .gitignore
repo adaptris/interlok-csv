@@ -29,4 +29,4 @@ target
 bin
 gradle.properties
 out/
-src/main/generated/
+**/src/main/generated/
