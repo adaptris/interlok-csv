@@ -16,8 +16,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.NoArgsConstructor;
 
 /**
- * Unchecked CSV to XML using {@code net.sf.supercsv:super-csv} that replaces
- * {@link com.adaptris.core.transform.csv.RawCsvToXmlTransformService}.
+ * Unchecked CSV to XML using {@code net.sf.supercsv:super-csv}.
  *
  * <p>
  * This service does not attempt to make parsing decisions, so CSV files that have differing number

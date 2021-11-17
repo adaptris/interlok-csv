@@ -40,13 +40,13 @@ public abstract class CsvToXmlServiceImpl extends CsvXmlTransformImpl {
   @InputFieldDefault(value = "csv-basic-preference-builder")
   private PreferenceBuilder preferenceBuilder;
   /**
-   * Specify whether or not to strip illegal XML characters from all the data before converting to
-   * XML.
+   * Specify whether or not to strip illegal XML characters from all the data before converting to XML.
    * <p>
-   * The following regular expression is used to strip out all invalid XML 1.0 characters :
-   * <code>"[^\u0009\r\n\u0020-\uD7FF\uE000-\uFFFD\ud800\udc00-\udbff\udfff]"</code>.
+   * The following regular expression is used to strip out all invalid XML 1.0 characters using {@link
+   * XmlHelper#stripIllegalXmlCharacters(String)}
    * </p>
    *
+   * @see XmlHelper#stripIllegalXmlCharacters(String)
    */
   @Getter
   @Setter
