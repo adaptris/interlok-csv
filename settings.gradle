@@ -1,1 +1,2 @@
-rootProject.name = 'interlok-csv'
+rootProject.name = 'interlok-csv-parent'
+include 'interlok-csv'
