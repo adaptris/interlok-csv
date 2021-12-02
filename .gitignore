@@ -30,3 +30,5 @@ bin
 gradle.properties
 out/
 **/src/main/generated/
+unit-tests.properties
+unit-tests.properties.resolved

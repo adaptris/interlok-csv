@@ -1,2 +1,3 @@
 rootProject.name = 'interlok-csv-parent'
 include 'interlok-csv'
+include 'interlok-csv-schema'

@@ -2,26 +2,33 @@
 
 ext {
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
-  componentName='Interlok Transform/CSV'
-  componentDesc="Handling CSV files using Interlok; transform to XML, splitting, JDBC utilities"
+  componentName='Interlok Validation/CSV'
+  componentDesc="Validating CSV files using a CSV Schema"
 }
 
+repositories {
+  maven {
+    url "https://oss.sonatype.org/content/repositories/releases/"
+    content {
+      excludeGroupByRegex "com\\.adaptris.*"
+    }
+  }
+}
 dependencies {
-  api ("com.adaptris:interlok-stax:$interlokCoreVersion") { changing=true}
-  api ("net.sf.supercsv:super-csv:2.4.0")
-
-  testImplementation ("org.apache.derby:derby:10.15.2.0")
-  testImplementation ("org.apache.derby:derbytools:10.15.2.0")
+  api ("uk.gov.nationalarchives:csv-validator-java-api:1.1.5")
+  // 0.1.0 has disappeared, used be in bintray that that's basically now defunct.
+  // https://dl.bintray.com/giltgroupe/maven/com/gilt/gfc-semver_2.11/0.1.0/gfc-semver_2.11-0.1.0.jar -> 403 Forbidden.
+  // This is fine since 1.2-RC3 actually uses 0.0.5
+  implementation("com.gilt:gfc-semver_2.11") {
+    version {
+      strictly '0.0.5'
+    }
+  }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-task examplesJar(type: Jar, dependsOn: test) {
-    classifier = 'examples'
-    from new File(buildDir, '/examples')
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -31,7 +38,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 artifacts {
   archives javadocJar
-  archives examplesJar
   archives sourcesJar
 }
 
@@ -41,7 +47,6 @@ publishing {
       from components.java
 
       artifact javadocJar { classifier "javadoc" }
-      artifact examplesJar { classifier "examples" }
       artifact sourcesJar { classifier "sources" }
 
       pom.withXml {
@@ -49,8 +54,8 @@ publishing {
         asNode().appendNode("name", componentName)
         asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/pages/cookbook/cookbook-csv-transform")
         def properties = asNode().appendNode("properties")
-        properties.appendNode("target", "3.8.0+")
-        properties.appendNode("tags", "csv,transform,jdbc")
+        properties.appendNode("target", "4.5.0+")
+        properties.appendNode("tags", "csv,schema")
         properties.appendNode("license", "false")
         properties.appendNode("repository", "https://github.com/adaptris/interlok-csv")
       }
@@ -73,10 +78,8 @@ delombok {
 }
 
 task deleteGeneratedFiles(type: Delete) {
-  delete file(testResourcesDir() + "/unit-tests.properties"), file(testResourcesDir() + "/unit-tests.properties.resolved"), delombokTargetDir, "derby.log"
+  delete file(testResourcesDir() + "/unit-tests.properties"), file(testResourcesDir() + "/unit-tests.properties.resolved"), delombokTargetDir
 }
 
 clean.dependsOn deleteGeneratedFiles
 processTestResources.dependsOn copyUnitTestProperties
-
-
