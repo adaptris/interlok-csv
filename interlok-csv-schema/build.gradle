@@ -54,10 +54,11 @@ publishing {
         asNode().appendNode("name", componentName)
         asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/pages/cookbook/cookbook-csv-transform")
         def properties = asNode().appendNode("properties")
-        properties.appendNode("target", "4.5.0+")
+        properties.appendNode("target", "4.4.0+")
         properties.appendNode("tags", "csv,schema")
         properties.appendNode("license", "false")
         properties.appendNode("repository", "https://github.com/adaptris/interlok-csv")
+        properties.appendNode("readme", "https://raw.githubusercontent.com/adaptris/interlok-csv/develop/interlok-csv-schema/README.md")
       }
     }
   }
