@@ -18,6 +18,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -54,6 +55,7 @@ public class ValidateCsv extends ServiceImp {
   @Getter
   @Setter
   @InputFieldDefault(value = "fail on errors")
+  @Valid
   private SchemaViolationHandler violationHandler;
 
   /**
