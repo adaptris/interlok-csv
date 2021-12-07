@@ -15,6 +15,7 @@ import com.adaptris.util.KeyValuePairSet;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.io.FileReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
@@ -43,7 +44,7 @@ public class ValidateCsv extends ServiceImp {
    */
   @Getter
   @Setter
-  @NotBlank
+  @NotBlank(message = "CSV Schema may not be blank")
   @InputFieldHint(expression = true)
   private String schemaFile;
 
@@ -132,7 +133,7 @@ public class ValidateCsv extends ServiceImp {
       // create a StringReader or something on it.
       // c.f. InputFieldExpression.isExpression()
       log.trace("Validating against {}", schemaToUse);
-      try (Reader data = msg.getReader(); FileReader schema = new FileReader(schemaToUse)) {
+      try (Reader data = msg.getReader(); FileReader schema = new FileReader(schemaToUse, StandardCharsets.UTF_8)) {
         failures = CsvValidator.validate(data, schema, failFast(), substitutionList,
             sensitivePathChecks(), trace());
       }

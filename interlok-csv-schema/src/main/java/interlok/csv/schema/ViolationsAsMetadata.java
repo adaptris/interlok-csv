@@ -11,7 +11,7 @@ public abstract class ViolationsAsMetadata implements SchemaViolationHandler {
   /** The metadata key to store failures against.
    *
    */
-  @NotBlank
+  @NotBlank(message = "metadata key may not be blank")
   @Getter
   @Setter
   private String metadataKey;
