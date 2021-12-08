@@ -321,10 +321,11 @@ subprojects {
     reportLevel = "high"
     reports {
       xml {
-        enabled = false
+        required.set(false)
       }
       html {
-        enabled = true
+        required.set(true)
+        stylesheet = 'default.xsl'
       }
     }
   }
