@@ -34,7 +34,7 @@ import uk.gov.nationalarchives.csv.validator.api.java.Substitution;
  * Validate a CSV file against a schema as defined by <a href="https://digital-preservation.github.io/csv-schema">CSV
  * Schema</a>.
  */
-@ComponentProfile(summary = "Validate a CSV file against a schema", since = "4.5.0", tag = "csv,schema")
+@ComponentProfile(summary = "Validate a CSV file against a schema", since = "4.4.0", tag = "csv,schema")
 @XStreamAlias("validate-csv-against-schema")
 @DisplayOrder(order = {"schemaFile", "violationHandler", "failFast", "additionalDebug", "substitutions", "caseSensitive"})
 @NoArgsConstructor
