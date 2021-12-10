@@ -20,8 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * CSV to XML using {@code net.sf.supercsv:super-csv} replacing
- * {@link com.adaptris.core.transform.csv.SimpleCsvToXmlTransformService}.
+ * CSV to XML using {@code net.sf.supercsv:super-csv}.
  * <p>
  * This transformation uses {@code net.sf.supercsv:super-csv} as the parsing engine for a CSV file
  * to write each row as part of an XML document.

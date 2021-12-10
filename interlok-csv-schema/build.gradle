@@ -1,0 +1,86 @@
+
+
+ext {
+  delombokTargetDir = new File("${project.projectDir}/src/main/generated")
+  componentName='Interlok Validation/CSV'
+  componentDesc="Validating CSV files using a CSV Schema"
+}
+
+repositories {
+  maven {
+    url "https://oss.sonatype.org/content/repositories/releases/"
+    content {
+      excludeGroupByRegex "com\\.adaptris.*"
+    }
+  }
+}
+dependencies {
+  api ("uk.gov.nationalarchives:csv-validator-java-api:1.1.5")
+  // 0.1.0 has disappeared, used be in bintray that that's basically now defunct.
+  // https://dl.bintray.com/giltgroupe/maven/com/gilt/gfc-semver_2.11/0.1.0/gfc-semver_2.11-0.1.0.jar -> 403 Forbidden.
+  // This is fine since 1.2-RC3 actually uses 0.0.5
+  implementation("com.gilt:gfc-semver_2.11") {
+    version {
+      strictly '0.0.5'
+    }
+  }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.extensions.delombokTask
+}
+
+artifacts {
+  archives javadocJar
+  archives sourcesJar
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact javadocJar { classifier "javadoc" }
+      artifact sourcesJar { classifier "sources" }
+
+      pom.withXml {
+        asNode().appendNode("description", componentDesc)
+        asNode().appendNode("name", componentName)
+        asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/pages/cookbook/cookbook-csv-transform")
+        def properties = asNode().appendNode("properties")
+        properties.appendNode("target", "4.4.0+")
+        properties.appendNode("tags", "csv,schema")
+        properties.appendNode("license", "false")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-csv")
+        properties.appendNode("readme", "https://raw.githubusercontent.com/adaptris/interlok-csv/develop/interlok-csv-schema/README.md")
+      }
+    }
+  }
+  repositories {
+    maven {
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+      url mavenPublishUrl
+    }
+  }
+}
+
+
+delombok {
+  target = delombokTargetDir
+}
+
+task deleteGeneratedFiles(type: Delete) {
+  delete file(testResourcesDir() + "/unit-tests.properties"), file(testResourcesDir() + "/unit-tests.properties.resolved"), delombokTargetDir
+}
+
+clean.dependsOn deleteGeneratedFiles
+processTestResources.dependsOn copyUnitTestProperties
