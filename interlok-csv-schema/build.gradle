@@ -19,7 +19,9 @@ dependencies {
   implementation("org.scala-lang.plugins:scala-continuations-library_2.11:1.0.3") {
     exclude(group: "org.scala-lang", module: "scala-library")
   }
-  api ("uk.gov.nationalarchives:csv-validator-java-api:1.1.5")
+  api ("uk.gov.nationalarchives:csv-validator-java-api:1.1.5") {
+    exclude (group: "com.gilt", module: "gfc-semver_2.11")
+  }
   // 0.1.0 has disappeared, used be in bintray that that's basically now defunct.
   // https://dl.bintray.com/giltgroupe/maven/com/gilt/gfc-semver_2.11/0.1.0/gfc-semver_2.11-0.1.0.jar -> 403 Forbidden.
   // This is fine since 1.2-RC3 actually uses 0.0.5
