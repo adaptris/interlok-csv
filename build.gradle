@@ -20,7 +20,7 @@ ext {
   interlokJavadocs= project.findProperty('interlokJavadocs') ?: javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
   interlokCommonJavadocs= project.findProperty('interlokCommonJavadocs') ?: javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
   interlokJsonJavadocs=project.findProperty('interlokJsonJavadocs') ?: javadocsBaseUrl + "/interlok-json/" + interlokCoreVersion
-  interlokStaxJavadocs=project.findProperty('interlokStaxJavadocs') ?: javadocsBaseUrl + "/interlok-arZ/" + interlokCoreVersion
+  interlokStaxJavadocs=project.findProperty('interlokStaxJavadocs') ?: javadocsBaseUrl + "/interlok-stax/" + interlokCoreVersion
 
   offlineJavadocPackageDir = new File(project.buildDir, "offline-javadoc-packages")
 
