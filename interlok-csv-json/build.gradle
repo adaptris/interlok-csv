@@ -9,7 +9,7 @@ ext {
 dependencies {
   api project(':interlok-csv')
   api ("com.adaptris:interlok-json:$interlokCoreVersion") { changing=true}
-  api ("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+  api ("com.fasterxml.jackson.core:jackson-databind:2.13.1")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
