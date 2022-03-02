@@ -29,4 +29,6 @@ target
 bin
 gradle.properties
 out/
-src/main/generated/
+**/src/main/generated/
+unit-tests.properties
+unit-tests.properties.resolved

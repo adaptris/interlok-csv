@@ -1,0 +1,16 @@
+## Create a new unit-tests.properties.template.<machine-name>
+# modify these properties in there to enable tests.
+# 
+#
+junit.ConsumerCase.baseDir=@BUILD_DIR@/examples/consumers
+junit.ServiceCase.baseDir=@BUILD_DIR@/examples/services
+junit.ProducerCase.baseDir=@BUILD_DIR@/examples/producers
+junit.WorkflowCase.baseDir=@BUILD_DIR@/examples/workflows
+junit.TransformServiceExamples.baseDir=@BUILD_DIR@/examples/services
+
+junit.CsvSchema.file=@BASE_DIR@/src/test/resources/warnings.csvs
+junit.CsvSchema.input.passes=@BASE_DIR@/src/test/resources/passes.csv
+junit.CsvSchema.input.warnings=@BASE_DIR@/src/test/resources/warnings.csv
+junit.CsvSchema.input.errors=@BASE_DIR@/src/test/resources/warningsAndErrors.csv
+
+

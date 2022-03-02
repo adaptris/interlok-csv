@@ -1,0 +1,71 @@
+
+
+ext {
+  delombokTargetDir = new File("${project.projectDir}/src/main/generated")
+  componentName='Interlok Transform/JSON+CSV'
+  componentDesc="Transform CSV into JSON and vice versa"
+}
+
+dependencies {
+  api project(':interlok-csv')
+  api ("com.adaptris:interlok-json:$interlokCoreVersion") { changing=true}
+  api ("com.fasterxml.jackson.core:jackson-databind:2.13.1")
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.extensions.delombokTask
+}
+
+artifacts {
+  archives javadocJar
+  archives sourcesJar
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact javadocJar { classifier "javadoc" }
+      artifact sourcesJar { classifier "sources" }
+
+      pom.withXml {
+        asNode().appendNode("description", componentDesc)
+        asNode().appendNode("name", componentName)
+        asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/pages/cookbook/cookbook-csv-transform")
+        def properties = asNode().appendNode("properties")
+        properties.appendNode("target", "3.6.6+")
+        properties.appendNode("tags", "json,transform,csv")
+        properties.appendNode("license", "false")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-csv")
+      }
+    }
+  }
+  repositories {
+    maven {
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+      url mavenPublishUrl
+    }
+  }
+}
+
+
+delombok {
+  target = delombokTargetDir
+}
+
+task deleteGeneratedFiles(type: Delete) {
+  delete file(testResourcesDir() + "/unit-tests.properties"), file(testResourcesDir() + "/unit-tests.properties.resolved"), delombokTargetDir
+}
+
+clean.dependsOn deleteGeneratedFiles
+processTestResources.dependsOn copyUnitTestProperties

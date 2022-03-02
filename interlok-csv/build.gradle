@@ -1,0 +1,82 @@
+
+
+ext {
+  delombokTargetDir = new File("${project.projectDir}/src/main/generated")
+  componentName='Interlok Transform/CSV'
+  componentDesc="Handling CSV files using Interlok; transform to XML, splitting, JDBC utilities"
+}
+
+dependencies {
+  api ("com.adaptris:interlok-stax:$interlokCoreVersion") { changing=true}
+  api ("net.sf.supercsv:super-csv:2.4.0")
+
+  testImplementation ("org.apache.derby:derby:10.15.2.0")
+  testImplementation ("org.apache.derby:derbytools:10.15.2.0")
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task examplesJar(type: Jar, dependsOn: test) {
+    classifier = 'examples'
+    from new File(buildDir, '/examples')
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.extensions.delombokTask
+}
+
+artifacts {
+  archives javadocJar
+  archives examplesJar
+  archives sourcesJar
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact javadocJar { classifier "javadoc" }
+      artifact examplesJar { classifier "examples" }
+      artifact sourcesJar { classifier "sources" }
+
+      pom.withXml {
+        asNode().appendNode("description", componentDesc)
+        asNode().appendNode("name", componentName)
+        asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/pages/cookbook/cookbook-csv-transform")
+        def properties = asNode().appendNode("properties")
+        properties.appendNode("target", "3.8.0+")
+        properties.appendNode("tags", "csv,transform,jdbc")
+        properties.appendNode("license", "false")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-csv")
+      }
+    }
+  }
+  repositories {
+    maven {
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+      url mavenPublishUrl
+    }
+  }
+}
+
+
+delombok {
+  target = delombokTargetDir
+}
+
+task deleteGeneratedFiles(type: Delete) {
+  delete file(testResourcesDir() + "/unit-tests.properties"), file(testResourcesDir() + "/unit-tests.properties.resolved"), delombokTargetDir, "derby.log"
+}
+
+clean.dependsOn deleteGeneratedFiles
+processTestResources.dependsOn copyUnitTestProperties
+
+
