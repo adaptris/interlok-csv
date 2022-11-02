@@ -2,15 +2,15 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.*
 
 plugins {
-  id 'com.github.spotbugs' version '5.0.7' apply false
-  id "io.freefair.lombok" version "6.4.3" apply false
-  id 'org.owasp.dependencycheck' version '7.1.0.1' apply false
-  id "org.gradle.test-retry" version "1.4.0" apply false
+  id 'com.github.spotbugs' version '5.0.12' apply false
+  id "io.freefair.lombok" version "6.5.1" apply false
+  id 'org.owasp.dependencycheck' version '7.2.1' apply false
+  id "org.gradle.test-retry" version "1.4.1" apply false
 }
 
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.5-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.5-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.6-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.6-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -26,9 +26,9 @@ ext {
 
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.36'
-  mockitoVersion = '4.5.1'
-  junitJupiterVersion = '5.8.2'
+  slf4jVersion = '2.0.3'
+  mockitoVersion = '4.8.0'
+  junitJupiterVersion = '5.9.1'
 
 }
 
@@ -188,7 +188,7 @@ subprojects {
       because 'allows JUnit 3 and JUnit 4 tests to run'
     }
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.8.2") {
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.1") {
       because 'allows tests to run from IDEs that bundle older version of launcher'
     }
 
