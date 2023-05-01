@@ -199,7 +199,7 @@ subprojects {
     offlineJavadocPackages ("com.adaptris:interlok-stax:$interlokCoreVersion:javadoc@jar") { changing= true}
     offlineJavadocPackages ("com.adaptris:interlok-json:$interlokCoreVersion:javadoc@jar") { changing= true}
 
-    umlDoclet("nl.talsmasoftware:umldoclet:2.0.14")
+    umlDoclet("nl.talsmasoftware:umldoclet:2.1.0")
 
   }
 
