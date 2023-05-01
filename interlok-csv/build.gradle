@@ -11,7 +11,7 @@ dependencies {
   api ("net.sf.supercsv:super-csv:2.4.0")
 
   testImplementation ("org.apache.derby:derby:10.15.2.0")
-  testImplementation ("org.apache.derby:derbytools:10.15.2.0")
+  testImplementation ("org.apache.derby:derbytools:10.16.1.1")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
