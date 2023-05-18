@@ -6,12 +6,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Implementation of {@link PreferenceBuilder} that allows for custom csv formats.
- * 
- * 
- * 
+ *
  * @config csv-custom-preference-builder
  * @author lchan
- * 
+ *
  */
 @XStreamAlias("csv-custom-preference-builder")
 public class CustomPreferenceBuilder implements PreferenceBuilder {
@@ -22,19 +20,19 @@ public class CustomPreferenceBuilder implements PreferenceBuilder {
   private Character quoteChar;
   private Boolean ignoreEmptyLines;
   private String recordSeparator;
-  
-  
+
   public Character getDelimiter() {
     return delimiter;
   }
 
   /**
    * Set the delimiter for the CSV file.
-   * 
-   * @param d the delimiter; if not specified, defaults to {@code ,}
+   *
+   * @param d
+   *          the delimiter; if not specified, defaults to {@code ,}
    */
   public void setDelimiter(Character d) {
-    this.delimiter = d;
+    delimiter = d;
   }
 
   char delimiter() {
@@ -47,8 +45,9 @@ public class CustomPreferenceBuilder implements PreferenceBuilder {
 
   /**
    * Set the quote character for the CSV file.
-   * 
-   * @param quoteChar the delimiter; if not specified, defaults to {@code "}
+   *
+   * @param quoteChar
+   *          the delimiter; if not specified, defaults to {@code "}
    */
   public void setQuoteChar(Character quoteChar) {
     this.quoteChar = quoteChar;
@@ -64,11 +63,12 @@ public class CustomPreferenceBuilder implements PreferenceBuilder {
 
   /**
    * Specify whether or not to ignore empty lines.
-   * 
-   * @param b true or false, if not specified false.
+   *
+   * @param b
+   *          true or false, if not specified false.
    */
   public void setIgnoreEmptyLines(Boolean b) {
-    this.ignoreEmptyLines = b;
+    ignoreEmptyLines = b;
   }
 
   boolean ignoreEmptyLines() {
@@ -81,11 +81,12 @@ public class CustomPreferenceBuilder implements PreferenceBuilder {
 
   /**
    * Set the record separactor
-   * 
-   * @param sep the record separator; if not specified defaults to "\r\n"
+   *
+   * @param sep
+   *          the record separator; if not specified defaults to "\r\n"
    */
   public void setRecordSeparator(String sep) {
-    this.recordSeparator = sep;
+    recordSeparator = sep;
   }
 
   String recordSeparator() {
@@ -94,8 +95,7 @@ public class CustomPreferenceBuilder implements PreferenceBuilder {
 
   @Override
   public CsvPreference build() {
-    return new CsvPreference.Builder(quoteChar(), delimiter(), recordSeparator()).ignoreEmptyLines(ignoreEmptyLines())
-        .build();
+    return new CsvPreference.Builder(quoteChar(), delimiter(), recordSeparator()).ignoreEmptyLines(ignoreEmptyLines()).build();
   }
 
 }

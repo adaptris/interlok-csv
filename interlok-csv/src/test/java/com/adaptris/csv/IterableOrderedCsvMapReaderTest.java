@@ -1,12 +1,14 @@
 package com.adaptris.csv;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mwarman
@@ -14,14 +16,13 @@ import org.junit.Test;
 public class IterableOrderedCsvMapReaderTest {
   public static final String LINE_ENDING = System.getProperty("line.separator");
 
-  private static final String CSV_INPUT_FIELD = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING
-      + "Record1,\"Sep 15, 2012\",,0" + LINE_ENDING
-      + "Record2,\"Sep 16, 2012\",,0" + LINE_ENDING
-      + "Record3,\"Sep 17, 2012\",,0" + LINE_ENDING;
+  private static final String CSV_INPUT_FIELD = "Name,Order Date,Date Attending,Total Paid" + LINE_ENDING + "Record1,\"Sep 15, 2012\",,0"
+      + LINE_ENDING + "Record2,\"Sep 16, 2012\",,0" + LINE_ENDING + "Record3,\"Sep 17, 2012\",,0" + LINE_ENDING;
 
   @Test
   public void testIteratorWithSetHeader() throws Exception {
-    try (IterableOrderedCsvMapReader reader = new IterableOrderedCsvMapReader(new StringReader(CSV_INPUT_FIELD), new BasicPreferenceBuilder().build())){
+    try (IterableOrderedCsvMapReader reader = new IterableOrderedCsvMapReader(new StringReader(CSV_INPUT_FIELD),
+        new BasicPreferenceBuilder().build())) {
       reader.setHeaders(reader.getHeader(true));
       List<Map<String, String>> results = CsvCaseUtils.toList(reader);
       assertTrue(results.get(0).containsKey("Name"));
@@ -53,7 +54,8 @@ public class IterableOrderedCsvMapReaderTest {
 
   @Test
   public void testIteratorWithoutSetHeader() throws Exception {
-    try (IterableOrderedCsvMapReader reader = new IterableOrderedCsvMapReader(new StringReader(CSV_INPUT_FIELD), new BasicPreferenceBuilder().build())){
+    try (IterableOrderedCsvMapReader reader = new IterableOrderedCsvMapReader(new StringReader(CSV_INPUT_FIELD),
+        new BasicPreferenceBuilder().build())) {
       List<Map<String, String>> results = CsvCaseUtils.toList(reader);
       assertTrue(results.get(0).containsKey("Name"));
       assertTrue(results.get(1).containsKey("Name"));

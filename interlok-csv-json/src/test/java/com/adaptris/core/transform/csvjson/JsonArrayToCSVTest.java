@@ -1,12 +1,15 @@
 package com.adaptris.core.transform.csvjson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
@@ -21,7 +24,7 @@ public class JsonArrayToCSVTest extends CsvBaseCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(JSON_ARRAY_INPUT);
     execute(service, msg);
     System.err.println(msg.getContent());
-    try (InputStream in = msg.getInputStream()){
+    try (InputStream in = msg.getInputStream()) {
       List<String> lines = IOUtils.readLines(in, Charset.defaultCharset());
       assertEquals(4, lines.size());
     }
@@ -34,7 +37,7 @@ public class JsonArrayToCSVTest extends CsvBaseCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(JSON_LINES_INPUT);
     execute(service, msg);
     System.err.println(msg.getContent());
-    try (InputStream in = msg.getInputStream()){
+    try (InputStream in = msg.getInputStream()) {
       List<String> lines = IOUtils.readLines(in, Charset.defaultCharset());
       assertEquals(3, lines.size());
     }
@@ -53,8 +56,6 @@ public class JsonArrayToCSVTest extends CsvBaseCase {
     assertEquals("bob", ctx.read("$[1].firstname"));
     assertEquals("carol", ctx.read("$[2].firstname"));
   }
-
-
 
   @Test
   public void testBrokenInput() throws Exception {
@@ -79,7 +80,6 @@ public class JsonArrayToCSVTest extends CsvBaseCase {
 
     }
   }
-
 
   @Override
   protected JsonArrayToCSV createForTests() {

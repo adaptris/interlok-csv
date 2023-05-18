@@ -13,7 +13,8 @@ import com.adaptris.interlok.util.CloseableIterable;
 /**
  * @author mwarman
  */
-public class IterableOrderedCsvMapReader extends OrderedCsvMapReader implements CloseableIterable<Map<String, String>>, Iterator<Map<String, String>> {
+public class IterableOrderedCsvMapReader extends OrderedCsvMapReader
+    implements CloseableIterable<Map<String, String>>, Iterator<Map<String, String>> {
   private boolean iteratorInvoked = false;
 
   private boolean firstLineCheck = true;
@@ -36,8 +37,8 @@ public class IterableOrderedCsvMapReader extends OrderedCsvMapReader implements 
   @Override
   public boolean hasNext() {
     try {
-      if(firstLineCheck && headers == null){
-        headers = this.getHeader(true);
+      if (firstLineCheck && headers == null) {
+        headers = getHeader(true);
         firstLineCheck = false;
       }
       if (nextLine == null) {
@@ -59,4 +60,5 @@ public class IterableOrderedCsvMapReader extends OrderedCsvMapReader implements 
   public void setHeaders(String[] headers) {
     this.headers = Args.notNull(headers, "headers");
   }
+
 }

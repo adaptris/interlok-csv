@@ -1,19 +1,20 @@
 package interlok.csv.schema;
 
+import java.util.Collection;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import java.util.Collection;
+
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.nationalarchives.csv.validator.api.java.FailMessage;
 
-/** If there are any warnings or errors present then throw an exception.
+/**
+ * If there are any warnings or errors present then throw an exception.
  *
  */
 @XStreamAlias("csv-schema-fail-on-warnings-or-errors")
 @NoArgsConstructor
-@Slf4j
 public class FailOnWarningOrError implements SchemaViolationHandler {
 
   @Override
@@ -23,4 +24,5 @@ public class FailOnWarningOrError implements SchemaViolationHandler {
       throw new ServiceException(toString(failures));
     }
   }
+
 }

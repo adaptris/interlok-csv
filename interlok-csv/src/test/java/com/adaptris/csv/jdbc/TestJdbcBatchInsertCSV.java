@@ -1,11 +1,14 @@
 package com.adaptris.csv.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
@@ -13,16 +16,15 @@ import com.adaptris.core.services.jdbc.JdbcMapInsert;
 
 public class TestJdbcBatchInsertCSV extends JdbcCSVInsertCase {
 
-
   @Test
   public void testAccumulate() throws Exception {
-    int[] rc = {1, 2, Statement.EXECUTE_FAILED};
+    int[] rc = { 1, 2, Statement.EXECUTE_FAILED };
     try {
       BatchInsertCSV.accumulate(rc);
     } catch (SQLException expected) {
 
     }
-    int[] rc2 = {1, 2, Statement.SUCCESS_NO_INFO};
+    int[] rc2 = { 1, 2, Statement.SUCCESS_NO_INFO };
     assertEquals(3, BatchInsertCSV.accumulate(rc2));
   }
 
@@ -36,7 +38,6 @@ public class TestJdbcBatchInsertCSV extends JdbcCSVInsertCase {
     assertEquals("3", msg.getMetadataValue("rowsAffected"));
     doAssert(3);
   }
-
 
   @Test
   public void testService_InvalidColumns() throws Exception {

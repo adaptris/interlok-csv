@@ -1,27 +1,29 @@
 package interlok.csv.schema;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.ServiceException;
-import interlok.csv.schema.SchemaViolationHandler.FailureType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import com.adaptris.core.AdaptrisMessage;
+import com.adaptris.core.AdaptrisMessageFactory;
+import com.adaptris.core.ServiceException;
+
+import interlok.csv.schema.SchemaViolationHandler.FailureType;
 import uk.gov.nationalarchives.csv.validator.api.java.ErrorMessage;
 import uk.gov.nationalarchives.csv.validator.api.java.FailMessage;
 import uk.gov.nationalarchives.csv.validator.api.java.WarningMessage;
 
 public class SchemaViolationHandlerTest {
-
 
   @Test
   public void testFilter() {
@@ -37,7 +39,8 @@ public class SchemaViolationHandlerTest {
   @Test
   public void testToString() {
     Collection<FailMessage> failures = createFailures(10, 10);
-    SchemaViolationHandler handler = (f, m) -> {};
+    SchemaViolationHandler handler = (f, m) -> {
+    };
     String toString = handler.toString(failures);
     assertTrue(toString.contains("error 9"));
     assertTrue(toString.contains("warning 5"));
@@ -93,7 +96,7 @@ public class SchemaViolationHandlerTest {
     SchemaViolationHandler handler = new ErrorsAsMetadata().withMetadataKey("schemaViolations");
     handler.handle(warningsOnly, msg);
     assertFalse(msg.headersContainsKey("schemaViolations"));
- }
+  }
 
   @Test
   public void testFailuresAsMetadata() throws Exception {
@@ -119,10 +122,10 @@ public class SchemaViolationHandlerTest {
     Random rand = ThreadLocalRandom.current();
     List<FailMessage> result = new ArrayList<>();
     for (int i = 0; i < warnings; i++) {
-      result.add(new WarningMessage("warning " + i, rand.nextInt(20), rand.nextInt(20) ));
+      result.add(new WarningMessage("warning " + i, rand.nextInt(20), rand.nextInt(20)));
     }
     for (int i = 0; i < errors; i++) {
-      result.add(new ErrorMessage("error " + i, rand.nextInt(20), rand.nextInt(20) ));
+      result.add(new ErrorMessage("error " + i, rand.nextInt(20), rand.nextInt(20)));
     }
     return result;
   }

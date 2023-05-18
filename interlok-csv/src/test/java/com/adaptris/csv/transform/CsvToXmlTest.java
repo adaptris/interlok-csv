@@ -1,9 +1,11 @@
 package com.adaptris.csv.transform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultMessageFactory;
@@ -18,10 +20,7 @@ import com.adaptris.util.text.xml.XPath;
 public class CsvToXmlTest extends TransformServiceExample {
 
   public static final String LINE_ENDING = System.getProperty("line.separator");
-  public static final String ILLEGAL_XML_CHAR = new String(new byte[]
-  {
-    (byte) 0x02
-  });
+  public static final String ILLEGAL_XML_CHAR = new String(new byte[] { (byte) 0x02 });
 
   public static final String CSV_INPUT_ILLEGAL_HEADER = "Name?,Order Date#,Date Attending,Total Paid" + ILLEGAL_XML_CHAR
       + LINE_ENDING + "Record1,\"Sep 15, 2012\",\"Oct 22, 2012 at 6:00 PM\",0" + LINE_ENDING
@@ -54,7 +53,6 @@ public class CsvToXmlTest extends TransformServiceExample {
       + "\navailable: DEFAULT, RFC4180, MYSQL, EXCEL and TAB_DELIMITED" + "\n"
       + "\nIf you wish to have complex transformation rules then you"
       + "\nshould be looking to use our flat file based transformation engine" + "\ninstead" + "\n-->\n";
-
 
   @Test
   public void testDoService_IllegalHeaders() throws Exception {
@@ -110,13 +108,11 @@ public class CsvToXmlTest extends TransformServiceExample {
     assertEquals("UTF-8", msg.getContentEncoding());
   }
 
-
   @Test
   public void testDoService_Excel() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     CsvToXml svc = new CsvToXml();
-    svc.setPreferenceBuilder(
-        new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.EXCEL_PREFERENCE));
+    svc.setPreferenceBuilder(new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.EXCEL_PREFERENCE));
     svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
@@ -131,8 +127,7 @@ public class CsvToXmlTest extends TransformServiceExample {
   public void testDoService_TabDelimiter() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_TAB);
     CsvToXml svc = new CsvToXml();
-    svc.setPreferenceBuilder(
-        new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.TAB_PREFERENCE));
+    svc.setPreferenceBuilder(new BasicPreferenceBuilder(BasicPreferenceBuilder.Style.TAB_PREFERENCE));
     svc.setUniqueRecordNames(true);
     execute(svc, msg);
     XPath xpath = new XPath();
@@ -230,8 +225,7 @@ public class CsvToXmlTest extends TransformServiceExample {
     try {
       execute(svc, msg);
       fail();
-    }
-    catch (ServiceException expected) {
+    } catch (ServiceException expected) {
 
     }
   }
@@ -244,8 +238,7 @@ public class CsvToXmlTest extends TransformServiceExample {
       // This fails because the 2nd record has "more fields" than the first.
       execute(svc, msg);
       fail();
-    }
-    catch (ServiceException expected) {
+    } catch (ServiceException expected) {
 
     }
   }
@@ -258,10 +251,9 @@ public class CsvToXmlTest extends TransformServiceExample {
     execute(svc, msg);
     try {
       // This should fail.
-      Document doc = XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
+      XmlHelper.createDocument(msg, new DocumentBuilderFactoryBuilder());
       fail();
-    }
-    catch (Exception expected) {
+    } catch (Exception expected) {
 
     }
     msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_ILLEGAL);
