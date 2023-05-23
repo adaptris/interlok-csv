@@ -1,9 +1,15 @@
 package interlok.csv.schema;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
@@ -11,10 +17,6 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairSet;
-import java.io.File;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
 
 public class ValidateCsvTest extends ExampleServiceCase {
 
@@ -34,8 +36,7 @@ public class ValidateCsvTest extends ExampleServiceCase {
 
   @Test
   public void testCsvWithErrors() throws Exception {
-    ValidateCsv service = new ValidateCsv().withSchema(getConfiguration(TEST_SCHEMA))
-        .withViolationHandler(new FailOnError());
+    ValidateCsv service = new ValidateCsv().withSchema(getConfiguration(TEST_SCHEMA)).withViolationHandler(new FailOnError());
     File file = new File(getConfiguration(TEST_INPUT_ERRORS));
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(FileUtils.readFileToByteArray(file));
     assertThrows(ServiceException.class, () -> execute(service, msg));
@@ -43,8 +44,7 @@ public class ValidateCsvTest extends ExampleServiceCase {
 
   @Test
   public void testCsvWithWarnings() throws Exception {
-    ValidateCsv service = new ValidateCsv().withSchema(getConfiguration(TEST_SCHEMA))
-        .withViolationHandler(new FailOnError());
+    ValidateCsv service = new ValidateCsv().withSchema(getConfiguration(TEST_SCHEMA)).withViolationHandler(new FailOnError());
     File file = new File(getConfiguration(TEST_INPUT_WARNING));
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(FileUtils.readFileToByteArray(file));
     // No Exceptions
@@ -101,4 +101,5 @@ public class ValidateCsvTest extends ExampleServiceCase {
     result.add(new KeyValuePair("dataPath", "./data"));
     return result;
   }
+
 }

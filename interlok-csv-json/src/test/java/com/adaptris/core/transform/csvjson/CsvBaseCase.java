@@ -1,13 +1,16 @@
 package com.adaptris.core.transform.csvjson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.EnumSet;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultAdaptrisMessageImp;
@@ -42,14 +45,10 @@ public abstract class CsvBaseCase extends ExampleServiceCase {
       .mappingProvider(new JacksonMappingProvider()).options(EnumSet.noneOf(Option.class)).build();
 
   protected static enum WhenToBreak {
-    INPUT,
-    OUTPUT,
-    BOTH,
-    NEVER
-  };
+    INPUT, OUTPUT, BOTH, NEVER
+  }
 
   protected abstract CSVConverter createForTests();
-
 
   @Test
   public void testPreferenceBuilder() throws Exception {
@@ -88,15 +87,14 @@ public abstract class CsvBaseCase extends ExampleServiceCase {
     }
 
     boolean brokenInput() {
-      return (when == WhenToBreak.INPUT) || (when == WhenToBreak.BOTH);
+      return when == WhenToBreak.INPUT || when == WhenToBreak.BOTH;
     }
 
     boolean brokenOutput() {
-      return (when == WhenToBreak.OUTPUT) || (when == WhenToBreak.BOTH);
+      return when == WhenToBreak.OUTPUT || when == WhenToBreak.BOTH;
     }
 
   }
-
 
   public class BrokenMessage extends DefaultAdaptrisMessageImp {
 
@@ -165,4 +163,5 @@ public abstract class CsvBaseCase extends ExampleServiceCase {
 
     }
   }
+
 }

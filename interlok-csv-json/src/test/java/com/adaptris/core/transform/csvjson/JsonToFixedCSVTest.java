@@ -1,27 +1,29 @@
 package com.adaptris.core.transform.csvjson;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.CoreException;
-import com.adaptris.core.ServiceCase;
 import com.adaptris.core.services.splitter.json.JsonProvider.JsonStyle;
 import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.BasicPreferenceBuilder.Style;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 
 // Note that using super-csv the standard preference terminates explicitly with \r\n
 // However, the line-endings are LF in the test files, which means that a straight comparison .equals()
 // won't work!.
 // We can compare each line though
-@SuppressWarnings("deprecation")
-public class JsonToFixedCSVTest extends ServiceCase {
+public class JsonToFixedCSVTest extends ExampleServiceCase {
   private static final String CSV_HEADER = "sentence_1,sentence_2,sentence_3,sentence_4,sentence_5,sentence_6,sentence_7";
 
   private static final String JSON_ARRAY = "array.json";
@@ -35,24 +37,13 @@ public class JsonToFixedCSVTest extends ServiceCase {
   private static final String JSON_LINES = "jsonlines.json";
   private static final String CSV_JSON_LINES = "jsonlines-header.csv";
 
-  private static final String JSON_ARRAY_PATH = "array-path.json";
-  private static final String JSON_ARRAY_PATH_JSONPATH = "$.sentences";
-  private static final String CSV_JSON_ARRAY_PATH = "array-path-header.csv";
-
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
-
-
   @Test
   public void testArrayWithHeader() throws Exception {
     AdaptrisMessage message = getMessage(JSON_ARRAY);
-    JsonToFixedCSV service =
-        new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.TRUE.toString()).withJsonStyle(JsonStyle.JSON_ARRAY)
-            .withPreferenceBuilder(new BasicPreferenceBuilder(Style.EXCEL_PREFERENCE));
+    JsonToFixedCSV service = new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.TRUE.toString()).withJsonStyle(JsonStyle.JSON_ARRAY)
+        .withPreferenceBuilder(new BasicPreferenceBuilder(Style.EXCEL_PREFERENCE));
     execute(service, message);
-    Assert.assertEquals(asList(CSV_ARRAY_HEADER), listify(message.getInputStream()));
+    assertEquals(asList(CSV_ARRAY_HEADER), listify(message.getInputStream()));
   }
 
   /**
@@ -63,13 +54,11 @@ public class JsonToFixedCSVTest extends ServiceCase {
   @Test
   public void testArrayNoHeader() throws Exception {
     AdaptrisMessage message = getMessage(JSON_ARRAY);
-    JsonToFixedCSV service =
-        new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.FALSE.toString()).withJsonStyle(JsonStyle.JSON_ARRAY);
+    JsonToFixedCSV service = new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.FALSE.toString()).withJsonStyle(JsonStyle.JSON_ARRAY);
 
     execute(service, message);
-    Assert.assertEquals(asList(CSV_ARRAY), listify(message.getInputStream()));
+    assertEquals(asList(CSV_ARRAY), listify(message.getInputStream()));
   }
-
 
   /**
    * Test that a JSON object becomes CSV data, and displaying CSV header column names.
@@ -79,14 +68,13 @@ public class JsonToFixedCSVTest extends ServiceCase {
   @Test
   public void testObjectWithHeader() throws Exception {
     AdaptrisMessage message = getMessage(JSON_OBJECT);
-    JsonToFixedCSV service =
-        new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.TRUE.toString()).withJsonStyle(JsonStyle.JSON_OBJECT)
-            .withPreferenceBuilder(new BasicPreferenceBuilder(Style.EXCEL_PREFERENCE));
+    JsonToFixedCSV service = new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.TRUE.toString()).withJsonStyle(JsonStyle.JSON_OBJECT)
+        .withPreferenceBuilder(new BasicPreferenceBuilder(Style.EXCEL_PREFERENCE));
 
     execute(service, message);
 
     System.err.println(message.getContent());
-    Assert.assertEquals(asList(CSV_OBJECT_HEADER), listify(message.getInputStream()));
+    assertEquals(asList(CSV_OBJECT_HEADER), listify(message.getInputStream()));
   }
 
   /**
@@ -97,22 +85,20 @@ public class JsonToFixedCSVTest extends ServiceCase {
   @Test
   public void testObjectNoHeader() throws Exception {
     AdaptrisMessage message = getMessage(JSON_OBJECT);
-    JsonToFixedCSV service =
-        new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.FALSE.toString()).withJsonStyle(JsonStyle.JSON_OBJECT)
-            .withPreferenceBuilder(new BasicPreferenceBuilder(Style.EXCEL_PREFERENCE));
+    JsonToFixedCSV service = new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.FALSE.toString()).withJsonStyle(JsonStyle.JSON_OBJECT)
+        .withPreferenceBuilder(new BasicPreferenceBuilder(Style.EXCEL_PREFERENCE));
 
     execute(service, message);
 
-    Assert.assertEquals(asList(CSV_OBJECT), listify(message.getInputStream()));
+    assertEquals(asList(CSV_OBJECT), listify(message.getInputStream()));
   }
 
   @Test
   public void testJsonLines() throws Exception {
     AdaptrisMessage message = getMessage(JSON_LINES);
-    JsonToFixedCSV service = new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.TRUE.toString())
-        .withJsonStyle(JsonStyle.JSON_LINES);
+    JsonToFixedCSV service = new JsonToFixedCSV(CSV_HEADER).withIncludeHeader(Boolean.TRUE.toString()).withJsonStyle(JsonStyle.JSON_LINES);
     execute(service, message);
-    Assert.assertEquals(asList(CSV_JSON_LINES), listify(message.getInputStream()));
+    assertEquals(asList(CSV_JSON_LINES), listify(message.getInputStream()));
   }
 
   /**
@@ -164,4 +150,5 @@ public class JsonToFixedCSVTest extends ServiceCase {
   protected Object retrieveObjectForSampleConfig() {
     return new JsonToFixedCSV("field1,field2");
   }
+
 }

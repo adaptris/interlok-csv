@@ -1,8 +1,10 @@
 package com.adaptris.csv.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,27 +12,23 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.ServiceCase;
 import com.adaptris.core.jdbc.JdbcConnection;
 import com.adaptris.core.services.jdbc.ConfiguredSQLStatement;
 import com.adaptris.core.services.jdbc.JdbcDataQueryService;
 import com.adaptris.core.util.JdbcUtil;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 import com.adaptris.util.GuidGenerator;
 import com.adaptris.util.TimeInterval;
 
-@SuppressWarnings("deprecation")
-public class CsvResultSetTranslatorTest extends ServiceCase {
+public class CsvResultSetTranslatorTest extends ExampleServiceCase {
 
   private static final GuidGenerator GUID = new GuidGenerator();
-
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
 
   @Override
   protected Object retrieveObjectForSampleConfig() {
@@ -42,7 +40,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
       service.setConnection(connection);
       CsvResultSetTranslator rst = new CsvResultSetTranslator();
       ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
-      ccf.setExcludeColumns(Arrays.asList(new String[] {"some","columns","to","exclude"}));
+      ccf.setExcludeColumns(Arrays.asList("some", "columns", "to", "exclude"));
       rst.setColumnFilter(ccf);
       service.setResultSetTranslator(rst);
       service.setStatementCreator(new ConfiguredSQLStatement("SELECT StringColumn1, StringColumn2 FROM tablename WHERE ID = 123"));
@@ -66,10 +64,10 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     s.setResultSetTranslator(new CsvResultSetTranslator());
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
   }
-  
+
   @Test
   public void testResultSetToCSV_WithResultCount() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
@@ -86,9 +84,9 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     s.setResultSetTranslator(t);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
-    assertTrue(msg.containsKey(getName()));
+    assertTrue(msg.headersContainsKey(getName()));
     assertEquals(10, Integer.parseInt(msg.getMetadataValue(getName())));
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
   }
 
@@ -104,14 +102,14 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
     ccf.setExcludeColumns(Collections.singletonList("adapter_unique_id"));
     rst.setColumnFilter(ccf);
-    
+
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
     s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
     assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
     assertEquals(2, lines.get(1).split(",").length);
@@ -127,7 +125,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     CsvResultSetTranslator rst = new CsvResultSetTranslator();
     ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
-    ccf.setIncludeColumns(Arrays.asList(new String[] {"ADAPTER_VERSION", "MESSAGE_TRANSLATOR_TYPE"}));
+    ccf.setIncludeColumns(Arrays.asList("ADAPTER_VERSION", "MESSAGE_TRANSLATOR_TYPE"));
     rst.setColumnFilter(ccf);
 
     JdbcDataQueryService s = new JdbcDataQueryService();
@@ -136,13 +134,12 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
     assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
     assertEquals(2, lines.get(1).split(",").length);
   }
 
-  
   @Test
   public void testResultSetToCSVWith2Exclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
@@ -153,22 +150,22 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
 
     CsvResultSetTranslator rst = new CsvResultSetTranslator();
     ConfiguredColumnFilter ccf = new ConfiguredColumnFilter();
-    ccf.setExcludeColumns(Arrays.asList(new String[] {"ADAPTER_UNIQUE_ID", "MESSAGE_TRANSLATOR_TYPE"}));
+    ccf.setExcludeColumns(Arrays.asList("ADAPTER_UNIQUE_ID", "MESSAGE_TRANSLATOR_TYPE"));
     rst.setColumnFilter(ccf);
-    
+
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
     s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
     s.setResultSetTranslator(rst);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     execute(s, msg);
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
     assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
     assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
     assertEquals(1, lines.get(1).split(",").length);
   }
-  
+
   @Test
   public void testResultSetToCSVWithMetadataExclusions() throws Exception {
     String url = "jdbc:derby:memory:" + GUID.safeUUID() + ";create=true";
@@ -181,7 +178,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     MetadataColumnFilter mcf = new MetadataColumnFilter();
     mcf.setExclusionKeys(Collections.singletonList("key"));
     rst.setColumnFilter(mcf);
-    
+
     JdbcDataQueryService s = new JdbcDataQueryService();
     s.setConnection(con);
     s.setStatementCreator(new ConfiguredSQLStatement("select * from data"));
@@ -189,13 +186,12 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     msg.addMetadata("key", "ADAPTER_UNIQUE_ID,MESSAGE_TRANSLATOR_TYPE");
     execute(s, msg);
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
     assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
     assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
     assertEquals(1, lines.get(1).split(",").length);
   }
-
 
   @Test
   public void testResultSetToCSVWithMetadataInclusions() throws Exception {
@@ -218,7 +214,7 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
     msg.addMetadata("inclusions", "ADAPTER_VERSION");
     execute(s, msg);
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
     assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
     assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
@@ -247,14 +243,12 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
     msg.addMetadata("inclusions", "ADAPTER_VERSION");
     msg.addMetadata("exclusions", "adapter_unique_id,MESSAGE_TRANSLATOR_TYPE");
     execute(s, msg);
-    List<String> lines = IOUtils.readLines(msg.getInputStream());
+    List<String> lines = IOUtils.readLines(msg.getInputStream(), Charset.defaultCharset());
     assertEquals(11, lines.size());
     assertFalse(lines.get(0).contains("ADAPTER_UNIQUE_ID"));
     assertFalse(lines.get(0).contains("MESSAGE_TRANSLATOR_TYPE"));
     assertEquals(1, lines.get(1).split(",").length);
   }
-
-
 
   @Override
   protected String createBaseFileName(Object o) {
@@ -276,14 +270,12 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
         s.execute("DROP TABLE data");
       } catch (Exception e) {
         // Ignore exceptions from the drop
-        ;
+
       }
-      s.execute("CREATE TABLE data " + "(adapter_unique_id VARCHAR(128) NOT NULL, "
-          + "adapter_version VARCHAR(128) NOT NULL, "
+      s.execute("CREATE TABLE data " + "(adapter_unique_id VARCHAR(128) NOT NULL, " + "adapter_version VARCHAR(128) NOT NULL, "
           + "message_translator_type VARCHAR(128) NOT NULL)");
-      insert = c.prepareStatement(
-          "INSERT INTO data "
-          + "(adapter_unique_id, adapter_version, message_translator_type) " + "values (?, ?, ?)");
+      insert = c
+          .prepareStatement("INSERT INTO data " + "(adapter_unique_id, adapter_version, message_translator_type) " + "values (?, ?, ?)");
       for (int i = 0; i < count; i++) {
         insert.clearParameters();
         insert.setString(1, GUID.getUUID());
@@ -297,4 +289,5 @@ public class CsvResultSetTranslatorTest extends ServiceCase {
       JdbcUtil.closeQuietly(insert);
     }
   }
+
 }

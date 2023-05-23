@@ -1,5 +1,11 @@
 package com.adaptris.core.transform.csvjson;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.supercsv.io.CsvListWriter;
+
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
@@ -16,20 +22,17 @@ import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.interlok.util.CloseableIterable;
 import com.adaptris.validation.constraints.BooleanExpression;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import java.util.ArrayList;
-import java.util.Map;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.ObjectUtils;
-import org.supercsv.io.CsvListWriter;
-
 
 /**
  * Transfrom a JSON array into a CSV.
  *
  * <p>
  * Takes a JSON array and renders it as a CSV document:
+ *
  * <pre>
  * {@code
  * [
@@ -38,7 +41,9 @@ import org.supercsv.io.CsvListWriter;
  *   { "firstname":"carol", "lastname":"smith", "dob":"2017-01-03" }
  * ]}
  * </pre>
+ *
  * will effectively render as
+ *
  * <pre>
  * {@code
  * firstname, lastname, dob
@@ -49,9 +54,9 @@ import org.supercsv.io.CsvListWriter;
  * </pre>
  * </p>
  * <p>
- * nested JSON objects will be rendered as strings before being passed into the appropriate statement; so
- * {@code { "firstname":"alice", "lastname":"smith", "address": { "address" : "Buckingham Palace", "postcode":"SW1A 1AA"}}} still
- * only be 3 CSV columns the address column will be {@code "{ "address" : "Buckingham Palace", "postcode":"SW1A 1AA"}"}
+ * nested JSON objects will be rendered as strings before being passed into the appropriate statement; so {@code { "firstname":"alice",
+ * "lastname":"smith", "address": { "address" : "Buckingham Palace", "postcode":"SW1A 1AA"}}} still only be 3 CSV columns the address column
+ * will be {@code "{ "address" : "Buckingham Palace", "postcode":"SW1A 1AA"}"}
  * </p>
  *
  * </p>
@@ -62,7 +67,7 @@ import org.supercsv.io.CsvListWriter;
 @AdapterComponent
 @ComponentProfile(summary = "Transfrom a JSON Array/JSON Lines document into a CSV", tag = "service,csv,json")
 @XStreamAlias("json-to-csv")
-@DisplayOrder(order = {"includeHeader", "jsonStyle", "preferenceBuilder"})
+@DisplayOrder(order = { "includeHeader", "jsonStyle", "preferenceBuilder" })
 @NoArgsConstructor
 public class JsonArrayToCSV extends CSVConverter {
 
@@ -130,4 +135,5 @@ public class JsonArrayToCSV extends CSVConverter {
     setIncludeHeader(s);
     return (T) this;
   }
+
 }

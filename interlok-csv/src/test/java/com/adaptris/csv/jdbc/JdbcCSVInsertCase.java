@@ -1,13 +1,16 @@
 package com.adaptris.csv.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.CoreException;
 import com.adaptris.core.jdbc.JdbcConnection;
 import com.adaptris.core.services.jdbc.JdbcMapInsert;
@@ -18,23 +21,15 @@ import com.adaptris.util.TimeInterval;
 
 public abstract class JdbcCSVInsertCase extends ExampleServiceCase {
 
+  protected static final String CSV_CONTENT = "firstname, lastname, dob\n" + "alice,smith,2017-01-01\n" + "bob,smith,2017-01-02\n"
+      + "carol,smith,2017-01-03";
 
-  protected static final String CSV_CONTENT =
-      "firstname, lastname, dob\n" +
-          "alice,smith,2017-01-01\n" +
-      "bob,smith,2017-01-02\n" +
-      "carol,smith,2017-01-03";
-
-  protected static final String INVALID_COLUMNS_CONTENT =
-      "$firstname, $lastname, dob\n" +
-          "alice,smith,2017-01-01\n" +
-      "bob,smith,2017-01-02\n" +
-      "carol,smith,2017-01-03";
+  protected static final String INVALID_COLUMNS_CONTENT = "$firstname, $lastname, dob\n" + "alice,smith,2017-01-01\n"
+      + "bob,smith,2017-01-02\n" + "carol,smith,2017-01-03";
 
   protected static final String CSV_JDBC_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
   protected static final String CSV_JDBC_URL = "jdbc:derby:memory:CSV_DB;create=true";
   protected static final String TABLE_NAME = "people";
-
 
   @Test
   public void testService_Init() throws Exception {
@@ -48,7 +43,6 @@ public abstract class JdbcCSVInsertCase extends ExampleServiceCase {
     service.setTable("hello");
     LifecycleHelper.init(service);
   }
-
 
   protected static void doAssert(int expectedCount) throws Exception {
     Connection c = null;
@@ -70,7 +64,6 @@ public abstract class JdbcCSVInsertCase extends ExampleServiceCase {
     }
   }
 
-
   protected static Connection createConnection() throws Exception {
     Connection c = null;
     Class.forName(CSV_JDBC_DRIVER);
@@ -86,8 +79,8 @@ public abstract class JdbcCSVInsertCase extends ExampleServiceCase {
       c = createConnection();
       s = c.createStatement();
       executeQuietly(s, String.format("DROP TABLE %s", TABLE_NAME));
-      s.execute(String.format("CREATE TABLE %s (firstname VARCHAR(128) NOT NULL, lastname VARCHAR(128) NOT NULL, dob VARCHAR(128))",
-          TABLE_NAME));
+      s.execute(
+          String.format("CREATE TABLE %s (firstname VARCHAR(128) NOT NULL, lastname VARCHAR(128) NOT NULL, dob VARCHAR(128))", TABLE_NAME));
     } finally {
       JdbcUtil.closeQuietly(s);
       JdbcUtil.closeQuietly(c);
@@ -98,7 +91,7 @@ public abstract class JdbcCSVInsertCase extends ExampleServiceCase {
     try {
       s.execute(sql);
     } catch (Exception e) {
-      ;
+
     }
   }
 

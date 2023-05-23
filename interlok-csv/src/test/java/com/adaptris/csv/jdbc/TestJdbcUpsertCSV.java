@@ -1,12 +1,15 @@
 package com.adaptris.csv.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
@@ -20,7 +23,6 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
   protected static final String ID_ELEMENT_VALUE = "firstname";
   protected static final String CAROL = "carol";
   protected static final String DOB = "2017-01-03";
-  
 
   @Test
   public void testService_Insert() throws Exception {
@@ -42,8 +44,7 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
     try {
       execute(service, msg);
       fail();
-    }
-    catch (ServiceException expected) {
+    } catch (ServiceException expected) {
 
     }
   }
@@ -76,10 +77,8 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
     try {
       c = createConnection();
       s = c.createStatement();
-      s.execute(
-          String.format("INSERT INTO %s (firstname, lastname, dob) VALUES ('%s', '%s' ,'%s')", TABLE_NAME, CAROL, SMITH, UTC_0));
-    }
-    finally {
+      s.execute(String.format("INSERT INTO %s (firstname, lastname, dob) VALUES ('%s', '%s' ,'%s')", TABLE_NAME, CAROL, SMITH, UTC_0));
+    } finally {
       JdbcUtil.closeQuietly(s);
       JdbcUtil.closeQuietly(c);
     }
@@ -95,14 +94,13 @@ public class TestJdbcUpsertCSV extends JdbcCSVInsertCase {
       rs = s.executeQuery(String.format("SELECT * FROM %s WHERE firstname='%s'", TABLE_NAME, firstname));
       if (rs.next()) {
         assertEquals(dob, rs.getString("dob"));
-      }
-      else {
+      } else {
         fail("No Match for firstname: " + firstname);
       }
-    }
-    finally {
+    } finally {
       JdbcUtil.closeQuietly(s);
       JdbcUtil.closeQuietly(c);
     }
   }
+
 }
