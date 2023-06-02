@@ -4,7 +4,7 @@ ext {
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
   componentName='Interlok Transform/JSON+CSV'
   componentDesc="Transform CSV into JSON and vice versa"
-  jacksonVersion="2.15.0"
+  jacksonVersion="2.15.1"
 }
 
 dependencies {
@@ -23,6 +23,17 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.extensions.delombokTask
+}
+
+jar {
+  manifest {
+    attributes("Built-By": System.getProperty('user.name'),
+               "Build-Jdk": System.getProperty('java.version'),
+               "Implementation-Title": componentName,
+               "Implementation-Version": project.version,
+               "Implementation-Vendor-Id": project.group,
+               "Implementation-Vendor": organizationName)
+  }
 }
 
 artifacts {
@@ -60,7 +71,6 @@ publishing {
     }
   }
 }
-
 
 delombok {
   target = delombokTargetDir
