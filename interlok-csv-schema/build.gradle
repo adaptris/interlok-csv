@@ -42,6 +42,17 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.extensions.delombokTask
 }
 
+jar {
+  manifest {
+    attributes("Built-By": System.getProperty('user.name'),
+               "Build-Jdk": System.getProperty('java.version'),
+               "Implementation-Title": componentName,
+               "Implementation-Version": project.version,
+               "Implementation-Vendor-Id": project.group,
+               "Implementation-Vendor": organizationName)
+  }
+}
+
 artifacts {
   archives javadocJar
   archives sourcesJar
@@ -78,7 +89,6 @@ publishing {
     }
   }
 }
-
 
 delombok {
   target = delombokTargetDir
