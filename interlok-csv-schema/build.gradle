@@ -15,7 +15,7 @@ repositories {
   }
 }
 dependencies {
-  implementation("org.scala-lang:scala-library:2.11.12")
+  implementation("org.scala-lang:scala-library:2.13.11")
   implementation("org.scala-lang.plugins:scala-continuations-library_2.11:1.0.3") {
     exclude(group: "org.scala-lang", module: "scala-library")
   }
