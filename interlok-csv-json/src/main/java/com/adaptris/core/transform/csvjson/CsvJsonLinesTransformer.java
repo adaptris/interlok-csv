@@ -3,20 +3,21 @@ package com.adaptris.core.transform.csvjson;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.Map;
+
 import org.supercsv.io.CsvMapReader;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.csv.OrderedCsvMapReader;
 import com.adaptris.csv.PreferenceBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
-@Slf4j
 public class CsvJsonLinesTransformer implements CsvJsonTransformer {
 
   @Getter(AccessLevel.PRIVATE)
@@ -37,5 +38,5 @@ public class CsvJsonLinesTransformer implements CsvJsonTransformer {
       throw ExceptionHelper.wrapServiceException(e);
     }
   }
-}
 
+}

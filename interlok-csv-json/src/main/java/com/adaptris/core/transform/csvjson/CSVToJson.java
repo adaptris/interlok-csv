@@ -1,6 +1,7 @@
 package com.adaptris.core.transform.csvjson;
 
 import org.apache.commons.lang3.ObjectUtils;
+
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
@@ -10,6 +11,7 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +21,7 @@ import lombok.Setter;
  * Transform a CSV document into a JSON object of some description.
  *
  * <p>
- * Takes a CSV document and renders as it as JSON, either a standard JSON Array or a
- * <a href="http://jsonlines.org">jsonlines</a>.
+ * Takes a CSV document and renders as it as JSON, either a standard JSON Array or a <a href="http://jsonlines.org">jsonlines</a>.
  * </p>
  * <p>
  * If our input document is
@@ -86,7 +87,6 @@ public class CSVToJson extends CSVConverter {
   @Setter(AccessLevel.PRIVATE)
   private transient CsvJsonTransformer transformer;
 
-
   /**
    * The JSON output style.
    * <p>
@@ -118,4 +118,5 @@ public class CSVToJson extends CSVConverter {
     setStyle(s);
     return this;
   }
+
 }

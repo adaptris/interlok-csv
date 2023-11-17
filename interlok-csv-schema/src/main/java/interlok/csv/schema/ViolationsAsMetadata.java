@@ -1,6 +1,7 @@
 package interlok.csv.schema;
 
 import javax.validation.constraints.NotBlank;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,7 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public abstract class ViolationsAsMetadata implements SchemaViolationHandler {
 
-  /** The metadata key to store failures against.
+  /**
+   * The metadata key to store failures against.
    *
    */
   @NotBlank(message = "metadata key may not be blank")
@@ -21,4 +23,5 @@ public abstract class ViolationsAsMetadata implements SchemaViolationHandler {
     setMetadataKey(key);
     return (T) this;
   }
+
 }

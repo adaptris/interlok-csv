@@ -1,9 +1,11 @@
 package com.adaptris.csv;
 
 import javax.validation.Valid;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.supercsv.io.CsvListWriter;
+
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.util.ExceptionHelper;
@@ -17,7 +19,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Render a list of {@link RemoteBlob} as a CSV
- * 
+ *
  * @config remote-blob-list-as-csv
  */
 @XStreamAlias("remote-blob-list-as-csv")
@@ -56,10 +58,11 @@ public class CsvBlobListRenderer implements BlobListRenderer {
   }
 
   /**
-   * @param prefs the CSV Preferences to set
+   * @param prefs
+   *          the CSV Preferences to set
    */
   public void setPreferenceBuilder(PreferenceBuilder prefs) {
-    this.preferenceBuilder = prefs;
+    preferenceBuilder = prefs;
   }
 
   private PreferenceBuilder preferenceBuilder() {
@@ -70,4 +73,5 @@ public class CsvBlobListRenderer implements BlobListRenderer {
     setPreferenceBuilder(prefs);
     return this;
   }
+
 }

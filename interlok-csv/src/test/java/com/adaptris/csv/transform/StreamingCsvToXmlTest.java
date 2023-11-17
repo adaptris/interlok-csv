@@ -4,12 +4,14 @@ import static com.adaptris.csv.transform.CsvToXmlTest.CSV_ILLEGAL;
 import static com.adaptris.csv.transform.CsvToXmlTest.CSV_INPUT;
 import static com.adaptris.csv.transform.CsvToXmlTest.CSV_INPUT_ILLEGAL_HEADER;
 import static com.adaptris.csv.transform.CsvToXmlTest.LINE_ENDING;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.DefaultMessageFactory;
@@ -23,6 +25,7 @@ import com.adaptris.interlok.junit.scaffolding.services.TransformServiceExample;
 import com.adaptris.stax.SaxonStreamWriterFactory;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.text.xml.XPath;
+
 import net.sf.saxon.s9api.Serializer;
 
 public class StreamingCsvToXmlTest extends TransformServiceExample {
@@ -47,8 +50,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     try {
       svc.setPreferenceBuilder(null);
       fail();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
 
     }
     assertEquals(BasicPreferenceBuilder.class, svc.getPreferenceBuilder().getClass());
@@ -198,8 +200,7 @@ public class StreamingCsvToXmlTest extends TransformServiceExample {
     try {
       execute(svc, msg);
       fail();
-    }
-    catch (ServiceException expected) {
+    } catch (ServiceException expected) {
 
     }
   }

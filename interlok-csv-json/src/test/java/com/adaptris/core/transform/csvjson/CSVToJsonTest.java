@@ -1,13 +1,16 @@
 package com.adaptris.core.transform.csvjson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.CoreException;
@@ -26,8 +29,8 @@ public class CSVToJsonTest extends CsvBaseCase {
     execute(service, msg);
     assertNotNull(msg.getContent());
     LineCountSplitter splitter = new LineCountSplitter(1);
-    Collection c = collect(splitter.splitMessage(msg));
-    assertEquals(3, c.size());
+    Collection<AdaptrisMessage> messages = collect(splitter.splitMessage(msg));
+    assertEquals(3, messages.size());
   }
 
   @Test
@@ -54,7 +57,6 @@ public class CSVToJsonTest extends CsvBaseCase {
     assertEquals("bob", ctx.read("$[1].firstname"));
     assertEquals("carol", ctx.read("$[2].firstname"));
   }
-
 
   @Test
   public void testBrokenInput_Array() throws Exception {
@@ -85,12 +87,11 @@ public class CSVToJsonTest extends CsvBaseCase {
     return new CSVToJson().withStyle(CSVToJson.OutputStyle.JSON_ARRAY);
   }
 
-  private static Collection<AdaptrisMessage> collect(Iterable<AdaptrisMessage> iter)
-      throws IOException, CoreException {
+  private static Collection<AdaptrisMessage> collect(Iterable<AdaptrisMessage> iter) throws IOException, CoreException {
     if (iter instanceof Collection) {
       return (Collection<AdaptrisMessage>) iter;
     }
-    List<AdaptrisMessage> result = new ArrayList<AdaptrisMessage>();
+    List<AdaptrisMessage> result = new ArrayList<>();
     try (CloseableIterable<AdaptrisMessage> messages = CloseableIterable.ensureCloseable(iter)) {
       for (AdaptrisMessage msg : messages) {
         result.add(msg);
@@ -98,4 +99,5 @@ public class CSVToJsonTest extends CsvBaseCase {
     }
     return result;
   }
+
 }

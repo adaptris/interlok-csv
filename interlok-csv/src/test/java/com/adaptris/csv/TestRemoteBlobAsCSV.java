@@ -1,13 +1,17 @@
 package com.adaptris.csv;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.CoreException;
@@ -29,20 +33,19 @@ public class TestRemoteBlobAsCSV {
     assertEquals(11, IOUtils.readLines(new StringReader(msg.getContent())).size());
   }
 
-  @Test(expected = CoreException.class)
+  @Test
   public void testRender_Fail() throws Exception {
-    CsvBlobListRenderer render =
-        new CsvBlobListRenderer().withPreferenceBuilder(new BasicPreferenceBuilder(Style.STANDARD_PREFERENCE));
+    CsvBlobListRenderer render = new CsvBlobListRenderer().withPreferenceBuilder(new BasicPreferenceBuilder(Style.STANDARD_PREFERENCE));
     AdaptrisMessage msg = new DefectiveMessageFactory(WhenToBreak.OUTPUT).newMessage();
     Collection<RemoteBlob> blobs = createBlobs(10);
-    render.render(blobs, msg);
+    assertThrows(CoreException.class, () -> render.render(blobs, msg));
   }
 
   private static Collection<RemoteBlob> createBlobs(int count) {
     List<RemoteBlob> result = new ArrayList<>();
     for (int i = 0; i < count; i++) {
-      result.add(new RemoteBlob.Builder().setBucket("bucket").setLastModified(new Date().getTime()).setName("File_" + i)
-          .setSize(10L).build());
+      result.add(
+          new RemoteBlob.Builder().setBucket("bucket").setLastModified(new Date().getTime()).setName("File_" + i).setSize(10L).build());
     }
     return result;
   }

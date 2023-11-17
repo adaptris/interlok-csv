@@ -1,14 +1,17 @@
 package interlok.csv.schema;
 
+import java.util.Collection;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.interlok.InterlokException;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import java.util.Collection;
+
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.nationalarchives.csv.validator.api.java.FailMessage;
 
-/** Record all CSV Schema validation failure messages as metadata.
+/**
+ * Record all CSV Schema validation failure messages as metadata.
  *
  */
 @Slf4j
@@ -23,4 +26,5 @@ public class FailuresAsMetadata extends ViolationsAsMetadata {
       msg.addMessageHeader(getMetadataKey(), toString(failures));
     }
   }
+
 }

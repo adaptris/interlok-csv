@@ -1,5 +1,17 @@
 package interlok.csv.schema;
 
+import java.io.FileReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
@@ -13,30 +25,21 @@ import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.util.KeyValuePairSet;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import java.io.FileReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.nationalarchives.csv.validator.api.java.CsvValidator;
 import uk.gov.nationalarchives.csv.validator.api.java.FailMessage;
 import uk.gov.nationalarchives.csv.validator.api.java.Substitution;
 
 /**
- * Validate a CSV file against a schema as defined by <a href="https://digital-preservation.github.io/csv-schema">CSV
- * Schema</a>.
+ * Validate a CSV file against a schema as defined by <a href="https://digital-preservation.github.io/csv-schema">CSV Schema</a>.
  */
 @ComponentProfile(summary = "Validate a CSV file against a schema", since = "4.4.0", tag = "csv,schema")
 @XStreamAlias("validate-csv-against-schema")
-@DisplayOrder(order = {"schemaFile", "violationHandler", "failFast", "additionalDebug", "substitutions", "caseSensitive"})
+@DisplayOrder(order = { "schemaFile", "violationHandler", "failFast", "additionalDebug", "substitutions", "caseSensitive" })
 @NoArgsConstructor
 public class ValidateCsv extends ServiceImp {
 
@@ -49,7 +52,8 @@ public class ValidateCsv extends ServiceImp {
   @InputFieldHint(expression = true)
   private String schemaFile;
 
-  /** What to do when the CSV file is considered invalid.
+  /**
+   * What to do when the CSV file is considered invalid.
    *
    */
   @Getter
@@ -60,8 +64,10 @@ public class ValidateCsv extends ServiceImp {
 
   /**
    * Whether or not we fail immediately on the first error or report on all errors.
-   * <p>Using failFast implies that you will fail on the first {@code ErrorMessage}, warnings will still be
-   * emitted but only up until the first error.</p>
+   * <p>
+   * Using failFast implies that you will fail on the first {@code ErrorMessage}, warnings will still be emitted but only up until the first
+   * error.
+   * </p>
    */
   @Getter
   @Setter
@@ -71,19 +77,21 @@ public class ValidateCsv extends ServiceImp {
 
   /**
    * Enable 'trace' mode when validating.
-   * <p>This actually causes a lot of output on stdout rather than delegating to a logger or similar, so for that
-   * reason we make it private for now to avoid std-out clutter.
+   * <p>
+   * This actually causes a lot of output on stdout rather than delegating to a logger or similar, so for that reason we make it private for
+   * now to avoid std-out clutter.
    * </p>
    */
   @Getter(AccessLevel.PRIVATE)
   @Setter(AccessLevel.PRIVATE)
-//  @AdvancedConfig
-//  @InputFieldDefault(value = "false")
+  // @AdvancedConfig
+  // @InputFieldDefault(value = "false")
   private Boolean additionalDebug;
 
   /**
    * Enable case sensitivity when performing external expression resolution.
-   * <p>Useful if you are <a href="https://digital-preservation.github.io/csv-schema/csv-schema-1.1.html#external-single-expressions">accessing
+   * <p>
+   * Useful if you are <a href="https://digital-preservation.github.io/csv-schema/csv-schema-1.1.html#external-single-expressions">accessing
    * external resources</a> as part of your schema.
    * </p>
    */
@@ -96,10 +104,10 @@ public class ValidateCsv extends ServiceImp {
   /**
    * The Path substitutions to apply.
    *
-   * <p>Useful if you are <a href="https://digital-preservation.github.io/csv-schema/csv-schema-1.1.html#external-single-expressions">accessing
-   * external resources</a> as part of your schema. This ultimately resolves to a list of {@code Substitution} objects
-   * which is passed into the {@code CsvValidator#validate()} method. The 'key' is the from, with the 'value' being the
-   * to.
+   * <p>
+   * Useful if you are <a href="https://digital-preservation.github.io/csv-schema/csv-schema-1.1.html#external-single-expressions">accessing
+   * external resources</a> as part of your schema. This ultimately resolves to a list of {@code Substitution} objects which is passed into
+   * the {@code CsvValidator#validate()} method. The 'key' is the from, with the 'value' being the to.
    * </p>
    */
   @Getter
@@ -114,7 +122,6 @@ public class ValidateCsv extends ServiceImp {
     substitutionList = new ArrayList<>();
     substitutions().forEach((k) -> substitutionList.add(new Substitution(k.getKey(), k.getValue())));
   }
-
 
   @Override
   protected void closeService() {
@@ -136,8 +143,7 @@ public class ValidateCsv extends ServiceImp {
       // c.f. InputFieldExpression.isExpression()
       log.trace("Validating against {}", schemaToUse);
       try (Reader data = msg.getReader(); FileReader schema = new FileReader(schemaToUse, StandardCharsets.UTF_8)) {
-        failures = CsvValidator.validate(data, schema, failFast(), substitutionList,
-            sensitivePathChecks(), trace());
+        failures = CsvValidator.validate(data, schema, failFast(), substitutionList, sensitivePathChecks(), trace());
       }
       violationHandler().handle(failures, msg);
     } catch (Exception e) {
@@ -174,4 +180,5 @@ public class ValidateCsv extends ServiceImp {
   private SchemaViolationHandler violationHandler() {
     return ObjectUtils.defaultIfNull(getViolationHandler(), new FailOnError());
   }
+
 }
