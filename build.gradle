@@ -180,7 +180,7 @@ subprojects {
     testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
     testImplementation ("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation ("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
-    testImplementation ("org.awaitility:awaitility:4.2.1")
+    testImplementation ("org.awaitility:awaitility:4.2.2")
 
     testRuntimeOnly ("org.slf4j:slf4j-simple:$slf4jVersion")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitJupiterVersion") {
