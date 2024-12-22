@@ -1,5 +1,6 @@
 package interlok.csv.schema;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +10,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
+import com.adaptris.core.fs.FsHelper;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -142,7 +144,8 @@ public class ValidateCsv extends ServiceImp {
       // create a StringReader or something on it.
       // c.f. InputFieldExpression.isExpression()
       log.trace("Validating against {}", schemaToUse);
-      try (Reader data = msg.getReader(); FileReader schema = new FileReader(schemaToUse, StandardCharsets.UTF_8)) {
+      File schemaFile = FsHelper.toFile(schemaToUse, new File(schemaToUse));
+      try (Reader data = msg.getReader(); FileReader schema = new FileReader(schemaFile, StandardCharsets.UTF_8)) {
         failures = CsvValidator.validate(data, schema, failFast(), substitutionList, sensitivePathChecks(), trace());
       }
       violationHandler().handle(failures, msg);
