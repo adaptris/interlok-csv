@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
