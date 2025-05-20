@@ -28,5 +28,18 @@
     <packageUrl regex="true">^pkg:maven/org.json/json@.*$</packageUrl>
     <cve>CVE-2022-45688</cve>
     <cpe>cpe:/a:hutool:hutool</cpe>
-  </suppress> 	
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+    This vulnerability is inherited via com.jayway.jsonpath:json-path:2.9.0 however that is currently the most up-to-date version.
+    ]]></notes>
+    <cve>CVE-2024-57699</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+    False positive as vulnerable Scala version is imported in com.gilt:gfc-semver.
+    This has been excluded as we distinctly import a secure version of Scala but still shows in the owasp check.
+    ]]></notes>
+    <cve>CVE-2017-15288</cve>
+  </suppress>
 </suppressions>
