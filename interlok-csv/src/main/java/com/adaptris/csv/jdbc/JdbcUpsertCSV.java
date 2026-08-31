@@ -4,7 +4,7 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.supercsv.io.CsvMapReader;
 

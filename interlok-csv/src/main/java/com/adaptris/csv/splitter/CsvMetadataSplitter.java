@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.supercsv.prefs.CsvPreference;

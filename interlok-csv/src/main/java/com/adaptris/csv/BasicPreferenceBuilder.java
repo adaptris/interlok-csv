@@ -1,6 +1,6 @@
 package com.adaptris.csv;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.supercsv.prefs.CsvPreference;
 
