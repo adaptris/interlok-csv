@@ -7,11 +7,13 @@ ext {
 }
 
 dependencies {
-  api ("com.adaptris:interlok-stax:$interlokCoreVersion") { changing=true}
-  api ("net.sf.supercsv:super-csv:2.4.0")
+  api platform(interlokCatalogPlatform)
 
-  testImplementation ("org.apache.derby:derby:10.15.2.0")
-  testImplementation ("org.apache.derby:derbytools:10.15.2.0")
+  api ("com.adaptris:interlok-stax") { changing=true}
+  api ("net.sf.supercsv:super-csv")
+
+  testImplementation ("org.apache.derby:derby")
+  testImplementation ("org.apache.derby:derbytools")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
