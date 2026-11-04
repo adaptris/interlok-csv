@@ -31,12 +31,6 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
-    This vulnerability is inherited via com.jayway.jsonpath:json-path:2.9.0 however that is currently the most up-to-date version.
-    ]]></notes>
-    <cve>CVE-2024-57699</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
     False positive as vulnerable Scala version is imported in com.gilt:gfc-semver.
     This has been excluded as we distinctly import a secure version of Scala but still shows in the owasp check.
     ]]></notes>
@@ -70,5 +64,83 @@
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty(\.http2|\.websocket)?/.+@10\.0\.26$</packageUrl>
     <cve>CVE-2026-2332</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-12611: https://github.com/jetty/jetty.project/security/advisories/GHSA-gpg9-4257-cfm3
+      Affected Jetty 10.0.0 through 10.0.31, including http2-common 10.0.26.
+      As of 2026-11-03, 10.0.26 is the newest public Jetty 10 release in Maven Central:
+      https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-server/maven-metadata.xml
+      No public same-major patch/minor fix is available; public remediation requires a major
+      upgrade to a fixed Jetty 12 release, which is outside the permitted upgrade policy.
+      Accepted risk: hostile HTTP/2 RST_STREAM/GOAWAY traffic can deadlock server writes
+      and exhaust request threads. This suppression does not fix that denial of service.
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty.http2/http2-common@10.0.26</packageUrl>
+    <cve>CVE-2026-12611</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-18661: https://github.com/jetty/jetty.project/security/advisories/GHSA-v6xf-996f-c35f
+      Affected jetty-annotations 10.0.0 through 10.0.32.
+      As of 2026-11-03, Maven Central has no Jetty 10 release newer than 10.0.26
+      (https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-annotations/maven-metadata.xml).
+      No public same-major patch/minor fix exists; a fixed public Jetty 12 release requires
+      a major upgrade, outside the permitted upgrade policy.
+      Accepted risk: mixed ServletSecurity annotations and web.xml constraints on multiple
+      URL patterns can leave intended authorization constraints unenforced.
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-annotations@10.0.26</packageUrl>
+    <cve>CVE-2026-18661</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-76184: https://github.com/jetty/jetty.project/security/advisories/GHSA-qfr2-43g5-g768
+      CVE-2026-77711: https://github.com/jetty/jetty.project/security/advisories/GHSA-r2c5-3p8g-wpvw
+      Both affect jetty-client 10.0.0 through 10.0.32.
+      As of 2026-11-03, Maven Central has no Jetty 10 release newer than 10.0.26
+      (https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-client/maven-metadata.xml).
+      No public same-major patch/minor fix exists; a fixed public Jetty 12 release requires
+      a major upgrade, outside the permitted upgrade policy.
+      Accepted risks: attacker-controlled same-origin redirects can disclose Authorization
+      credentials, and origin-server 407 responses through a forward proxy can disclose
+      proxy credentials to that server. These risks remain in the retained client.
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-client@10.0.26</packageUrl>
+    <cve>CVE-2026-76184</cve>
+    <cve>CVE-2026-77711</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2026-18659: https://github.com/jetty/jetty.project/security/advisories/GHSA-53x7-f9fc-h7qr
+      CVE-2026-18662: https://github.com/jetty/jetty.project/security/advisories/GHSA-phjh-v7c6-g7mv
+      CVE-2026-19864: https://github.com/jetty/jetty.project/security/advisories/GHSA-q6wx-j9wr-fj7f
+      All affect jetty-security 10.0.0 through 10.0.32.
+      As of 2026-11-03, Maven Central has no Jetty 10 release newer than 10.0.26
+      (https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-security/maven-metadata.xml).
+      No public same-major patch/minor fix exists; a fixed public Jetty 12 release requires
+      a major upgrade, outside the permitted upgrade policy.
+      Accepted risks: http-method-omission constraints can be bypassed or incorrectly
+      combined, and persisted authenticated sessions may expose plaintext passwords to
+      readers of the session store. Authorization and credential-disclosure risks remain.
+    ]]></notes>
+    <packageUrl>pkg:maven/org.eclipse.jetty/jetty-security@10.0.26</packageUrl>
+    <cve>CVE-2026-18659</cve>
+    <cve>CVE-2026-18662</cve>
+    <cve>CVE-2026-19864</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      CVE-2024-47855: https://www.cve.org/CVERecord?id=CVE-2024-47855
+      https://github.com/kordamp/json-lib/releases/tag/v3.1.0
+      JSON-lib before 3.1.0 mishandles an unbalanced comment string in JSONTokener.
+      The inherited net.sf.json-lib:json-lib:2.4:jdk15 is affected; there is no newer
+      stable 2.x release. The maintained fork fixes this in 3.1.0, requiring a major
+      version and coordinate migration, outside the permitted upgrade policy.
+      Accepted risk: parsing attacker-controlled malformed JSON comments can cause
+      denial of service. The legacy parser remains vulnerable; this is not a fix.
+    ]]></notes>
+    <packageUrl>pkg:maven/net.sf.json-lib/json-lib@2.4</packageUrl>
+    <cve>CVE-2024-47855</cve>
   </suppress>
 </suppressions>
